@@ -1,9 +1,36 @@
 import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Upload, Type, Palette, Bold, Italic } from 'lucide-react';
 
 export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
   const [editMode, setEditMode] = useState(false);
-  const [tempData, setTempData] = useState(data);
+  const [tempData, setTempData] = useState({
+    ...data,
+    logoImage: data.logoImage || null,
+    logoText: data.logoText || data.logo || '',
+    logoStyle: {
+      fontSize: '24',
+      fontWeight: 'bold',
+      color: theme?.primaryColor || '#3B82F6',
+      fontStyle: 'normal',
+      ...data.logoStyle
+    },
+    navigationStyle: {
+      fontSize: '16',
+      fontWeight: 'medium',
+      color: '#6B7280',
+      hoverColor: '#111827',
+      ...data.navigationStyle
+    },
+    ctaStyle: {
+      fontSize: '16',
+      fontWeight: 'medium', 
+      backgroundColor: theme?.primaryColor || '#3B82F6',
+      textColor: '#FFFFFF',
+      borderRadius: '8',
+      padding: '12',
+      ...data.ctaStyle
+    }
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSave = () => {
@@ -12,44 +39,301 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
   };
 
   const handleCancel = () => {
-    setTempData(data);
+    setTempData({
+      ...data,
+      logoImage: data.logoImage || null,
+      logoText: data.logoText || data.logo || '',
+      logoStyle: {
+        fontSize: '24',
+        fontWeight: 'bold',
+        color: theme?.primaryColor || '#3B82F6',
+        fontStyle: 'normal',
+        ...data.logoStyle
+      },
+      navigationStyle: {
+        fontSize: '16',
+        fontWeight: 'medium',
+        color: '#6B7280',
+        hoverColor: '#111827',
+        ...data.navigationStyle
+      },
+      ctaStyle: {
+        fontSize: '16',
+        fontWeight: 'medium',
+        backgroundColor: theme?.primaryColor || '#3B82F6',
+        textColor: '#FFFFFF',
+        borderRadius: '8',
+        padding: '12',
+        ...data.ctaStyle
+      }
+    });
     setEditMode(false);
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setTempData({ ...tempData, logoImage: e.target.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setTempData({ ...tempData, logoImage: null });
   };
 
   if (editMode && !isPreview) {
     return (
-      <div className="p-6 bg-blue-50 border-2 border-blue-200 rounded-xl">
+      <div className="p-6 bg-blue-50 border-2 border-blue-200 rounded-xl max-h-96 overflow-y-auto">
         <h3 className="text-lg font-semibold mb-4 text-blue-900">Modifier l'En-tête</h3>
         
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Logo</label>
-            <input
-              type="text"
-              value={tempData.logo}
-              onChange={(e) => setTempData({ ...tempData, logo: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+        <div className="space-y-6">
+          {/* Logo Section */}
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+              <Type className="w-4 h-4 mr-2" />
+              Configuration du Logo
+            </h4>
+            
+            {/* Logo Image Upload */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Image du Logo</label>
+              <div className="flex items-center space-x-4">
+                {tempData.logoImage ? (
+                  <div className="flex items-center space-x-2">
+                    <img 
+                      src={tempData.logoImage} 
+                      alt="Logo" 
+                      className="w-12 h-12 object-contain border rounded"
+                    />
+                    <button
+                      onClick={removeImage}
+                      className="px-2 py-1 bg-red-100 text-red-600 text-xs rounded hover:bg-red-200"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-lg cursor-pointer hover:bg-gray-200">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choisir une image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
+            {/* Logo Text */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Texte du Logo</label>
+              <input
+                type="text"
+                value={tempData.logoText}
+                onChange={(e) => setTempData({ ...tempData, logoText: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Nom de votre marque"
+              />
+            </div>
+
+            {/* Logo Styling */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Taille (px)</label>
+                <input
+                  type="number"
+                  min="12"
+                  max="48"
+                  value={tempData.logoStyle.fontSize}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    logoStyle: { ...tempData.logoStyle, fontSize: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Couleur</label>
+                <input
+                  type="color"
+                  value={tempData.logoStyle.color}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    logoStyle: { ...tempData.logoStyle, color: e.target.value }
+                  })}
+                  className="w-full h-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-4 mt-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={tempData.logoStyle.fontWeight === 'bold'}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    logoStyle: { ...tempData.logoStyle, fontWeight: e.target.checked ? 'bold' : 'normal' }
+                  })}
+                  className="mr-2"
+                />
+                <Bold className="w-4 h-4 mr-1" />
+                Gras
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={tempData.logoStyle.fontStyle === 'italic'}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    logoStyle: { ...tempData.logoStyle, fontStyle: e.target.checked ? 'italic' : 'normal' }
+                  })}
+                  className="mr-2"
+                />
+                <Italic className="w-4 h-4 mr-1" />
+                Italique
+              </label>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Navigation (séparés par des virgules)</label>
-            <input
-              type="text"
-              value={tempData.navigation.join(', ')}
-              onChange={(e) => setTempData({ ...tempData, navigation: e.target.value.split(', ') })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          {/* Navigation Section */}
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-3">Navigation</h4>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Éléments de menu (séparés par des virgules)</label>
+              <input
+                type="text"
+                value={tempData.navigation.join(', ')}
+                onChange={(e) => setTempData({ ...tempData, navigation: e.target.value.split(', ') })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Taille</label>
+                <select
+                  value={tempData.navigationStyle.fontSize}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    navigationStyle: { ...tempData.navigationStyle, fontSize: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="14">14px</option>
+                  <option value="16">16px</option>
+                  <option value="18">18px</option>
+                  <option value="20">20px</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Couleur</label>
+                <input
+                  type="color"
+                  value={tempData.navigationStyle.color}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    navigationStyle: { ...tempData.navigationStyle, color: e.target.value }
+                  })}
+                  className="w-full h-10 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Hover</label>
+                <input
+                  type="color"
+                  value={tempData.navigationStyle.hoverColor}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    navigationStyle: { ...tempData.navigationStyle, hoverColor: e.target.value }
+                  })}
+                  className="w-full h-10 border border-gray-300 rounded-lg"
+                />
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Texte du Bouton CTA</label>
-            <input
-              type="text"
-              value={tempData.ctaText}
-              onChange={(e) => setTempData({ ...tempData, ctaText: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          {/* CTA Button Section */}
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-3">Bouton d'Appel à l'Action</h4>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Texte du bouton</label>
+              <input
+                type="text"
+                value={tempData.ctaText}
+                onChange={(e) => setTempData({ ...tempData, ctaText: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Couleur de fond</label>
+                <input
+                  type="color"
+                  value={tempData.ctaStyle.backgroundColor}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    ctaStyle: { ...tempData.ctaStyle, backgroundColor: e.target.value }
+                  })}
+                  className="w-full h-10 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Couleur du texte</label>
+                <input
+                  type="color"
+                  value={tempData.ctaStyle.textColor}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    ctaStyle: { ...tempData.ctaStyle, textColor: e.target.value }
+                  })}
+                  className="w-full h-10 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Style de bordure</label>
+                <select
+                  value={tempData.ctaStyle.borderRadius}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    ctaStyle: { ...tempData.ctaStyle, borderRadius: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="0">Carré (0px)</option>
+                  <option value="4">Légèrement arrondi (4px)</option>
+                  <option value="8">Arrondi (8px)</option>
+                  <option value="12">Très arrondi (12px)</option>
+                  <option value="20">Pilule (20px)</option>
+                  <option value="50">Rond complet (50px)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Taille du bouton</label>
+                <select
+                  value={tempData.ctaStyle.padding}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    ctaStyle: { ...tempData.ctaStyle, padding: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="8">Petit (8px)</option>
+                  <option value="10">Compact (10px)</option>
+                  <option value="12">Normal (12px)</option>
+                  <option value="16">Grand (16px)</option>
+                  <option value="20">Très grand (20px)</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -77,12 +361,28 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
         <div className="flex justify-between items-center py-6 md:justify-start md:space-x-10">
           {/* Logo */}
           <div className="flex justify-start lg:w-0 lg:flex-1">
-            <span 
-              className="text-2xl font-bold cursor-pointer"
-              style={{ color: theme?.primaryColor || '#3B82F6' }}
-            >
-              {data.logo}
-            </span>
+            <div className="flex items-center space-x-3 cursor-pointer">
+              {tempData.logoImage && (
+                <img 
+                  src={tempData.logoImage} 
+                  alt="Logo" 
+                  className="h-10 w-auto object-contain"
+                />
+              )}
+              {tempData.logoText && (
+                <span 
+                  className="cursor-pointer"
+                  style={{ 
+                    fontSize: `${tempData.logoStyle.fontSize}px`,
+                    fontWeight: tempData.logoStyle.fontWeight,
+                    color: tempData.logoStyle.color,
+                    fontStyle: tempData.logoStyle.fontStyle
+                  }}
+                >
+                  {tempData.logoText}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -98,11 +398,18 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-10">
-            {data.navigation.map((item, index) => (
+            {tempData.navigation.map((item, index) => (
               <a
                 key={index}
                 href="#"
-                className="text-base font-medium text-gray-500 hover:text-gray-900 transition-colors duration-200"
+                className="transition-colors duration-200"
+                style={{
+                  fontSize: `${tempData.navigationStyle.fontSize}px`,
+                  fontWeight: tempData.navigationStyle.fontWeight,
+                  color: tempData.navigationStyle.color
+                }}
+                onMouseEnter={(e) => e.target.style.color = tempData.navigationStyle.hoverColor}
+                onMouseLeave={(e) => e.target.style.color = tempData.navigationStyle.color}
               >
                 {item}
               </a>
@@ -112,10 +419,17 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
             <button
-              className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white transition-all duration-200 hover:scale-105 hover:shadow-lg"
-              style={{ backgroundColor: theme?.primaryColor || '#3B82F6' }}
+              className="ml-8 whitespace-nowrap inline-flex items-center justify-center border border-transparent shadow-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg"
+              style={{ 
+                backgroundColor: tempData.ctaStyle.backgroundColor,
+                color: tempData.ctaStyle.textColor,
+                borderRadius: `${tempData.ctaStyle.borderRadius}px`,
+                padding: `${tempData.ctaStyle.padding}px ${parseInt(tempData.ctaStyle.padding) * 1.5}px`,
+                fontSize: `${tempData.ctaStyle.fontSize}px`,
+                fontWeight: tempData.ctaStyle.fontWeight
+              }}
             >
-              {data.ctaText}
+              {tempData.ctaText}
             </button>
           </div>
         </div>
@@ -126,11 +440,15 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
         <div className="absolute top-full left-0 w-full bg-white shadow-lg border-t border-gray-200 md:hidden z-50">
           <div className="px-5 pt-5 pb-6">
             <nav className="grid gap-y-8">
-              {data.navigation.map((item, index) => (
+              {tempData.navigation.map((item, index) => (
                 <a
                   key={index}
                   href="#"
-                  className="text-base font-medium text-gray-900 hover:text-gray-700"
+                  className="font-medium hover:text-gray-700"
+                  style={{
+                    fontSize: `${tempData.navigationStyle.fontSize}px`,
+                    color: tempData.navigationStyle.color
+                  }}
                 >
                   {item}
                 </a>
@@ -138,10 +456,17 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
             </nav>
             <div className="mt-6">
               <button
-                className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white"
-                style={{ backgroundColor: theme?.primaryColor || '#3B82F6' }}
+                className="w-full flex items-center justify-center border border-transparent shadow-sm font-medium"
+                style={{ 
+                  backgroundColor: tempData.ctaStyle.backgroundColor,
+                  color: tempData.ctaStyle.textColor,
+                  borderRadius: `${tempData.ctaStyle.borderRadius}px`,
+                  padding: `${tempData.ctaStyle.padding}px`,
+                  fontSize: `${tempData.ctaStyle.fontSize}px`,
+                  fontWeight: tempData.ctaStyle.fontWeight
+                }}
               >
-                {data.ctaText}
+                {tempData.ctaText}
               </button>
             </div>
           </div>
