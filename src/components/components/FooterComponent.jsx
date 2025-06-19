@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Eye, Type, Upload } from 'lucide-react';
 
 const socialIcons = {
   Facebook: Facebook,
@@ -13,7 +13,10 @@ const socialIcons = {
 
 export default function FooterComponent({ data, onEdit, isPreview, theme }) {
   const [editMode, setEditMode] = useState(false);
-  const [tempData, setTempData] = useState(data);
+  const [tempData, setTempData] = useState({
+    ...data,
+    copyright: data.copyright || `© ${new Date().getFullYear()} ${data.logo}. Tous droits réservés.`
+  });
 
   const handleSave = () => {
     if (onEdit) onEdit(tempData);
@@ -21,7 +24,10 @@ export default function FooterComponent({ data, onEdit, isPreview, theme }) {
   };
 
   const handleCancel = () => {
-    setTempData(data);
+    setTempData({
+      ...data,
+      copyright: data.copyright || `© ${new Date().getFullYear()} ${data.logo}. Tous droits réservés.`
+    });
     setEditMode(false);
   };
 
@@ -33,63 +39,89 @@ export default function FooterComponent({ data, onEdit, isPreview, theme }) {
 
   if (editMode && !isPreview) {
     return (
-      <div className="p-6 bg-gray-50 border-2 border-gray-200 rounded-xl">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">Modifier le Pied de Page</h3>
+      <div className="p-6 bg-blue-50 border-2 border-blue-200 rounded-xl max-h-[80vh] overflow-y-auto">
+        <h3 className="text-lg font-semibold mb-4 text-blue-900">Modifier le Pied de Page</h3>
         
-        <div className="space-y-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Logo</label>
+        <div className="space-y-6">
+          {/* Brand Section */}
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-3">Marque</h4>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Logo/Text</label>
+                <input
+                  type="text"
+                  value={tempData.logo}
+                  onChange={(e) => setTempData({ ...tempData, logo: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  value={tempData.description}
+                  onChange={(e) => setTempData({ ...tempData, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Links Section */}
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-3">Liens</h4>
+            {Object.entries(tempData.links).map(([category, links]) => (
+              <div key={category} className="mb-6">
+                <h5 className="font-medium mb-3 text-gray-800">{category}</h5>
+                <div className="space-y-2">
+                  {links.map((link, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      value={link}
+                      onChange={(e) => handleLinkChange(category, index, e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Social Media Section */}
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-3">Réseaux Sociaux</h4>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Réseaux à afficher (séparés par des virgules)
+              </label>
+              <input
+                type="text"
+                value={tempData.social.join(', ')}
+                onChange={(e) => setTempData({ ...tempData, social: e.target.value.split(', ') })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Facebook, Twitter, Instagram, LinkedIn, Email, Phone, Location"
+              />
+            </div>
+          </div>
+
+          {/* Copyright Section */}
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-3">Copyright</h4>
             <input
               type="text"
-              value={tempData.logo}
-              onChange={(e) => setTempData({ ...tempData, logo: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+              value={tempData.copyright}
+              onChange={(e) => setTempData({ ...tempData, copyright: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-            <textarea
-              value={tempData.description}
-              onChange={(e) => setTempData({ ...tempData, description: e.target.value })}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <h4 className="font-semibold text-gray-800">Liens</h4>
-          {Object.entries(tempData.links).map(([category, links]) => (
-            <div key={category} className="p-4 border border-gray-200 rounded-lg">
-              <h5 className="font-medium mb-3">{category}</h5>
-              {links.map((link, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  value={link}
-                  onChange={(e) => handleLinkChange(category, index, e.target.value)}
-                  className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Réseaux Sociaux (séparés par des virgules)</label>
-          <input
-            type="text"
-            value={tempData.social.join(', ')}
-            onChange={(e) => setTempData({ ...tempData, social: e.target.value.split(', ') })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
-          />
         </div>
 
         <div className="flex gap-3 mt-6">
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
           >
             Sauvegarder
           </button>
@@ -106,7 +138,7 @@ export default function FooterComponent({ data, onEdit, isPreview, theme }) {
 
   return (
     <footer 
-      className="bg-gray-800 text-white"
+      className="bg-gray-800 text-white group relative"
       onClick={() => !isPreview && setEditMode(true)}
     >
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
@@ -160,14 +192,14 @@ export default function FooterComponent({ data, onEdit, isPreview, theme }) {
         </div>
         <div className="mt-12 border-t border-gray-700 pt-8">
           <p className="text-base text-gray-400 text-center">
-            © 2024 {data.logo}. Tous droits réservés.
+            {data.copyright || `© ${new Date().getFullYear()} ${data.logo}. Tous droits réservés.`}
           </p>
         </div>
       </div>
 
       {!isPreview && (
-        <div className="absolute inset-0 bg-gray-500 bg-opacity-0 hover:bg-opacity-10 transition-all duration-200 cursor-pointer rounded-lg">
-          <div className="absolute top-2 left-2 bg-gray-500 text-white px-2 py-1 rounded text-xs opacity-0 hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 cursor-pointer rounded-lg">
+          <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
             Cliquer pour modifier
           </div>
         </div>
