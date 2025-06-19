@@ -137,7 +137,7 @@ export default function HeroComponent({ data, onEdit, isPreview, theme }) {
 
   if (editMode && !isPreview) {
     return (
-      <div className="p-6 bg-green-50 border-2 border-green-200 rounded-xl max-h-96 overflow-y-auto">
+      <div className="p-6 bg-blue-50 border-2 border-green-200 rounded-xl max-h-96 overflow-y-auto">
         <h3 className="text-lg font-semibold mb-4 text-green-900">Modifier la Section Hero</h3>
 
         <div className="space-y-6">
@@ -518,7 +518,7 @@ export default function HeroComponent({ data, onEdit, isPreview, theme }) {
         <div className="flex gap-3 mt-6">
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
           >
             Sauvegarder
           </button>
@@ -595,20 +595,21 @@ export default function HeroComponent({ data, onEdit, isPreview, theme }) {
     </div>
   );
 
-  const renderImage = () => (
-    tempData.heroImage && (
-      <div className={`${tempData.layout === 'centered' ? 'mt-12' : 'lg:w-1/2'}`}>
-        <img
-          className={`object-cover rounded-lg ${tempData.layout === 'centered'
-              ? 'w-full h-64 sm:h-80 md:h-96 mx-auto'
-              : 'w-full h-56 sm:h-72 md:h-96 lg:h-full'
-            }`}
-          src={typeof tempData.heroImage === 'string' ? tempData.heroImage : URL.createObjectURL(tempData.heroImage)}
-          alt="Hero"
-        />
-      </div>
-    )
-  );
+const renderImage = () => (
+  tempData.heroImage && (
+    <div className={`${tempData.layout === 'centered' ? 'mt-12' : 'lg:w-1/2'}`}>
+      <img
+        className={`object-cover rounded-lg ${
+          tempData.layout === 'centered' 
+            ? 'w-full h-64 sm:h-80 md:h-96 mx-auto' 
+            : 'w-full h-56 sm:h-72 md:h-96 lg:h-full'
+        }`}
+        src={typeof tempData.heroImage === 'string' ? tempData.heroImage : URL.createObjectURL(tempData.heroImage)}
+        alt="Hero"
+      />
+    </div>
+  )
+);
 
   return (
     <section
@@ -633,8 +634,8 @@ export default function HeroComponent({ data, onEdit, isPreview, theme }) {
       </div>
 
       {!isPreview && (
-        <div className="absolute inset-0 bg-green-500 bg-opacity-0 hover:bg-opacity-10 transition-all duration-200 cursor-pointer rounded-lg">
-          <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs opacity-0 hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0  bg-blue-500 bg-opacity-0 hover:bg-opacity-10 transition-all duration-200 cursor-pointer rounded-lg">
+          <div className="absolute top-2 left-2  bg-blue-500 text-white px-2 py-1 rounded text-xs opacity-0 hover:opacity-100 transition-opacity">
             Cliquer pour modifier
           </div>
         </div>
