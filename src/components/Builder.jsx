@@ -9,8 +9,7 @@ import SaveModal from './SaveModal';
 export default function Builder({ initialProject, onSave }) {
   const [components, setComponents] = useState(initialProject?.components || []);
   const [isPreview, setIsPreview] = useState(false);
-  const [showCode, setShowCode] = useState(false);
-  const [showTheme, setShowTheme] = useState(false);
+  const [showCode, setShowCode] = useState(false);  const [showTheme, setShowTheme] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [currentDevice, setCurrentDevice] = useState('desktop');
   const [theme, setTheme] = useState(initialProject?.theme || {
@@ -39,7 +38,7 @@ export default function Builder({ initialProject, onSave }) {
   }, []);
 
   const updateComponent = useCallback((id, content) => {
-    setComponents(prev => 
+    setComponents(prev =>
       prev.map(comp => comp.id === id ? { ...comp, content } : comp)
     );
   }, []);
@@ -149,7 +148,7 @@ export default function Builder({ initialProject, onSave }) {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar 
+      <Sidebar
         onAddComponent={addComponent}
         onTogglePreview={() => setIsPreview(!isPreview)}
         onToggleCode={() => setShowCode(!showCode)}
@@ -159,18 +158,22 @@ export default function Builder({ initialProject, onSave }) {
         currentDevice={currentDevice}
         onDeviceChange={setCurrentDevice}
       />
-      
+
       <div className="flex-1 flex flex-col">
         {showCode ? (
-          <CodeView components={components} theme={theme} />
+          <CodeView
+            components={components}
+            theme={theme}
+            onBack={() => setShowCode(false)}
+          />
         ) : isPreview ? (
-          <Preview 
-            components={components} 
+          <Preview
+            components={components}
             theme={theme}
             device={currentDevice}
           />
         ) : (
-          <Canvas 
+          <Canvas
             components={components}
             onUpdateComponent={updateComponent}
             onDeleteComponent={deleteComponent}
@@ -181,7 +184,7 @@ export default function Builder({ initialProject, onSave }) {
       </div>
 
       {showTheme && (
-        <ThemePanel 
+        <ThemePanel
           theme={theme}
           onThemeChange={setTheme}
           onClose={() => setShowTheme(false)}

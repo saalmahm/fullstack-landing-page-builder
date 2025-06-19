@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, ArrowLeft } from 'lucide-react';
 
-export default function CodeView({ components, theme }) {
+export default function CodeView({ components, theme, onBack }) {
   const [copied, setCopied] = useState(false);
 
   const generateCode = () => {
@@ -192,20 +192,38 @@ export default LandingPage;`;
   };
 
   return (
-    <div className="flex-1 bg-gray-900">
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+    <div className="flex-1 flex flex-col bg-gray-900 h-full">
+      {/* Header avec boutons */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 rounded-md transition-colors"
+        >
+          <ArrowLeft size={18} />
+          <span className="text-sm font-medium">Retour</span>
+        </button>
+
         <h2 className="text-lg font-semibold text-white">Code Généré</h2>
+
         <button
           onClick={copyToClipboard}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 ${
+            copied 
+              ? 'bg-green-600 text-white' 
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
+          }`}
         >
           {copied ? <Check size={18} /> : <Copy size={18} />}
-          {copied ? 'Copié!' : 'Copier'}
+          <span className="text-sm">{copied ? 'Copié!' : 'Copier'}</span>
         </button>
       </div>
-      <pre className="p-6 text-sm text-gray-300 overflow-auto h-full">
-        <code>{generateCode()}</code>
-      </pre>
+
+      {/* Contenu du code */}
+      <div className="flex-1 overflow-auto">
+        <pre className="p-6 text-sm text-gray-300">
+          <code>{generateCode()}</code>
+        </pre>
+      </div>
     </div>
   );
 }
