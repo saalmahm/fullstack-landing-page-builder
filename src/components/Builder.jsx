@@ -11,7 +11,6 @@ export default function Builder({ initialProject, onSave }) {
   const [isPreview, setIsPreview] = useState(false);
   const [showCode, setShowCode] = useState(false);  const [showTheme, setShowTheme] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [currentDevice, setCurrentDevice] = useState('desktop');
   const [theme, setTheme] = useState(initialProject?.theme || {
     primaryColor: '#3B82F6',
     secondaryColor: '#8B5CF6',
@@ -155,8 +154,6 @@ export default function Builder({ initialProject, onSave }) {
         onToggleTheme={() => setShowTheme(!showTheme)}
         onSave={() => setShowSaveModal(true)}
         isPreview={isPreview}
-        currentDevice={currentDevice}
-        onDeviceChange={setCurrentDevice}
       />
 
       <div className="flex-1 flex flex-col">
@@ -170,7 +167,6 @@ export default function Builder({ initialProject, onSave }) {
           <Preview
             components={components}
             theme={theme}
-            device={currentDevice}
           />
         ) : (
           <Canvas

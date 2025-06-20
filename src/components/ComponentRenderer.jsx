@@ -12,7 +12,7 @@ export default function ComponentRenderer({ component, onEdit, isPreview = false
       data: component.content,
       onEdit: onEdit ? (content) => onEdit(component.id, content) : undefined,
       isPreview,
-      theme
+      theme,
     };
 
     switch (component.type) {
@@ -37,5 +37,9 @@ export default function ComponentRenderer({ component, onEdit, isPreview = false
     }
   };
 
-  return renderComponent();
+  return (
+    <div className="component-wrapper">
+      {renderComponent()}
+    </div>
+  );
 }

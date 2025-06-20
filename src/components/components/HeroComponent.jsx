@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Play, Upload, Type, Palette, Bold, Italic, AlignLeft, AlignCenter, Eye } from 'lucide-react';
 
-export default function HeroComponent({ data, onEdit, isPreview, theme }) {
-  const [editMode, setEditMode] = useState(false);
+export default function HeroComponent({ data, onEdit, isPreview, theme }) {  const [editMode, setEditMode] = useState(false);
+  const isMobile = device === 'mobile';
+  const isTablet = device === 'tablet';
   const [tempData, setTempData] = useState({
     ...data,
     heroImage: data.heroImage || data.image || '',

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Plus, Eye, Code, Palette, Smartphone, Monitor, Download, Tablet, Save } from 'lucide-react';
-
+import { Plus, Eye, Code, Palette, Save } from 'lucide-react';
 const componentTypes = [
   { type: 'header', label: 'En-tête', icon: '🏠' },
   { type: 'hero', label: 'Section Hero', icon: '⭐' },
@@ -17,8 +16,6 @@ export default function Sidebar({
   onToggleTheme,
   onSave,
   isPreview,
-  currentDevice,
-  onDeviceChange 
 }) {
   return (
     <div className="w-80 bg-white border-r border-gray-200 h-full overflow-y-auto shadow-lg">
@@ -65,43 +62,6 @@ export default function Sidebar({
             <Save size={18} />
             <span className="text-sm font-semibold">Sauver</span>
           </button>
-        </div>
-
-        {/* Device Selection */}
-        <div className="mb-8">
-          <h3 className="text-sm font-bold text-gray-700 mb-4">Aperçu Device</h3>
-          <div className="flex gap-3">
-            <button
-              onClick={() => onDeviceChange('desktop')}
-              className={`p-3 rounded-xl border-2 transition-all duration-300 hover:scale-110 ${
-                currentDevice === 'desktop' 
-                  ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md' 
-                  : 'border-gray-200 hover:border-blue-300 text-gray-700'
-              }`}
-            >
-              <Monitor size={22} />
-            </button>
-            <button
-              onClick={() => onDeviceChange('tablet')}
-              className={`p-3 rounded-xl border-2 transition-all duration-300 hover:scale-110 ${
-                currentDevice === 'tablet' 
-                  ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md' 
-                  : 'border-gray-200 hover:border-blue-300 text-gray-700'
-              }`}
-            >
-              <Tablet size={22} />
-            </button>
-            <button
-              onClick={() => onDeviceChange('mobile')}
-              className={`p-3 rounded-xl border-2 transition-all duration-300 hover:scale-110 ${
-                currentDevice === 'mobile' 
-                  ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md' 
-                  : 'border-gray-200 hover:border-blue-300 text-gray-700'
-              }`}
-            >
-              <Smartphone size={22} />
-            </button>
-          </div>
         </div>
 
         {/* Components */}
