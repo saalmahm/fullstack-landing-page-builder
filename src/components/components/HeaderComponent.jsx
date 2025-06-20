@@ -356,17 +356,17 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
   }
 
   return (
-    <header className="bg-white shadow-sm relative" onClick={() => !isPreview && setEditMode(true)}>
+    <header className="bg-white shadow-sm relative w-full" onClick={() => !isPreview && setEditMode(true)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-6 md:justify-start md:space-x-10">
+        <div className="flex justify-between items-center py-6">
           {/* Logo */}
-          <div className="flex justify-start lg:w-0 lg:flex-1">
+          <div className="flex items-center flex-shrink-0">
             <div className="flex items-center space-x-3 cursor-pointer">
               {tempData.logoImage && (
                 <img 
                   src={tempData.logoImage} 
                   alt="Logo" 
-                  className="h-10 w-auto object-contain"
+                  className="h-8 w-auto object-contain sm:h-9 md:h-10"
                 />
               )}
               {tempData.logoText && (
@@ -385,24 +385,13 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
             </div>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="-mr-2 -my-2 md:hidden">
-            <button
-              type="button"
-              className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-10">
+          {/* Desktop Navigation - Hidden on mobile */}
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {tempData.navigation.map((item, index) => (
               <a
                 key={index}
                 href="#"
-                className="transition-colors duration-200"
+                className="transition-colors duration-200 hover:text-gray-900"
                 style={{
                   fontSize: `${tempData.navigationStyle.fontSize}px`,
                   fontWeight: tempData.navigationStyle.fontWeight,
@@ -416,10 +405,10 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
             ))}
           </nav>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
+          {/* Desktop CTA - Hidden on mobile */}
+          <div className="hidden md:block">
             <button
-              className="ml-8 whitespace-nowrap inline-flex items-center justify-center border border-transparent shadow-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg"
+              className="whitespace-nowrap transition-all duration-200 hover:scale-105"
               style={{ 
                 backgroundColor: tempData.ctaStyle.backgroundColor,
                 color: tempData.ctaStyle.textColor,
@@ -432,47 +421,61 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
               {tempData.ctaText}
             </button>
           </div>
+
+          {/* Mobile menu button - Hidden on desktop */}
+          <div className="md:hidden flex items-center">
+            <button
+              type="button"
+              className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMobileMenuOpen(!mobileMenuOpen);
+              }}
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="absolute top-full left-0 w-full bg-white shadow-lg border-t border-gray-200 md:hidden z-50">
-          <div className="px-5 pt-5 pb-6">
-            <nav className="grid gap-y-8">
-              {tempData.navigation.map((item, index) => (
-                <a
-                  key={index}
-                  href="#"
-                  className="font-medium hover:text-gray-700"
-                  style={{
-                    fontSize: `${tempData.navigationStyle.fontSize}px`,
-                    color: tempData.navigationStyle.color
-                  }}
-                >
-                  {item}
-                </a>
-              ))}
-            </nav>
-            <div className="mt-6">
-              <button
-                className="w-full flex items-center justify-center border border-transparent shadow-sm font-medium"
-                style={{ 
-                  backgroundColor: tempData.ctaStyle.backgroundColor,
-                  color: tempData.ctaStyle.textColor,
-                  borderRadius: `${tempData.ctaStyle.borderRadius}px`,
-                  padding: `${tempData.ctaStyle.padding}px`,
-                  fontSize: `${tempData.ctaStyle.fontSize}px`,
-                  fontWeight: tempData.ctaStyle.fontWeight
+      {/* Mobile menu - Slide down animation */}
+      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96' : 'max-h-0'}`}>
+        <div className="px-4 pb-4 bg-white shadow-md">
+          <nav className="grid gap-y-4">
+            {tempData.navigation.map((item, index) => (
+              <a
+                key={index}
+                href="#"
+                className="block px-3 py-2 rounded-md font-medium hover:bg-gray-50"
+                style={{
+                  fontSize: `${tempData.navigationStyle.fontSize}px`,
+                  color: tempData.navigationStyle.color
                 }}
+                onClick={() => setMobileMenuOpen(false)}
               >
-                {tempData.ctaText}
-              </button>
-            </div>
+                {item}
+              </a>
+            ))}
+          </nav>
+          <div className="mt-4 px-3">
+            <button
+              className="w-full flex items-center justify-center border border-transparent shadow-sm font-medium py-2"
+              style={{ 
+                backgroundColor: tempData.ctaStyle.backgroundColor,
+                color: tempData.ctaStyle.textColor,
+                borderRadius: `${tempData.ctaStyle.borderRadius}px`,
+                padding: `${tempData.ctaStyle.padding}px`,
+                fontSize: `${tempData.ctaStyle.fontSize}px`,
+                fontWeight: tempData.ctaStyle.fontWeight
+              }}
+            >
+              {tempData.ctaText}
+            </button>
           </div>
         </div>
-      )}
+      </div>
 
+      {/* Edit overlay */}
       {!isPreview && (
         <div className="absolute inset-0 bg-blue-500 bg-opacity-0 hover:bg-opacity-10 transition-all duration-200 cursor-pointer rounded-lg">
           <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs opacity-0 hover:opacity-100 transition-opacity">
