@@ -7,6 +7,9 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
     ...data,
     logoImage: data.logoImage || null,
     logoText: data.logoText || data.logo || '',
+    navbarStyle: {
+      backgroundColor: data.navbarStyle?.backgroundColor || '#FFFFFF',
+    },
     logoStyle: {
       fontSize: '24',
       fontWeight: 'bold',
@@ -43,6 +46,9 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
       ...data,
       logoImage: data.logoImage || null,
       logoText: data.logoText || data.logo || '',
+      navbarStyle: {
+        backgroundColor: data.navbarStyle?.backgroundColor || '#FFFFFF',
+      },
       logoStyle: {
         fontSize: '24',
         fontWeight: 'bold',
@@ -91,6 +97,37 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
         <h3 className="text-lg font-semibold mb-4 text-blue-900">Modifier l'En-tête</h3>
         
         <div className="space-y-6">
+          {/* Navbar Background Section */}
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+              <Palette className="w-4 h-4 mr-2" />
+              Style de la Navbar
+            </h4>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Couleur de fond
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={tempData.navbarStyle.backgroundColor}
+                  onChange={(e) => setTempData({ 
+                    ...tempData, 
+                    navbarStyle: { 
+                      ...tempData.navbarStyle, 
+                      backgroundColor: e.target.value 
+                    }
+                  })}
+                  className="w-10 h-10 border border-gray-300 rounded-lg cursor-pointer"
+                />
+                <span className="text-sm text-gray-600">
+                  {tempData.navbarStyle.backgroundColor}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Logo Section */}
           <div className="bg-white p-4 rounded-lg border">
             <h4 className="font-medium text-gray-900 mb-3 flex items-center">
@@ -356,7 +393,11 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
   }
 
   return (
-    <header className="bg-white shadow-sm relative w-full" onClick={() => !isPreview && setEditMode(true)}>
+    <header 
+      className="shadow-sm relative w-full" 
+      style={{ backgroundColor: tempData.navbarStyle.backgroundColor }}
+      onClick={() => !isPreview && setEditMode(true)}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
           {/* Logo */}
@@ -385,7 +426,7 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
             </div>
           </div>
 
-          {/* Desktop Navigation - Hidden on mobile */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {tempData.navigation.map((item, index) => (
               <a
@@ -405,7 +446,7 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
             ))}
           </nav>
 
-          {/* Desktop CTA - Hidden on mobile */}
+          {/* Desktop CTA */}
           <div className="hidden md:block">
             <button
               className="whitespace-nowrap transition-all duration-200 hover:scale-105"
@@ -422,15 +463,16 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
             </button>
           </div>
 
-          {/* Mobile menu button - Hidden on desktop */}
+          {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
               type="button"
-              className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
               onClick={(e) => {
                 e.stopPropagation();
                 setMobileMenuOpen(!mobileMenuOpen);
               }}
+              style={{ backgroundColor: tempData.navbarStyle.backgroundColor }}
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -438,9 +480,12 @@ export default function HeaderComponent({ data, onEdit, isPreview, theme }) {
         </div>
       </div>
 
-      {/* Mobile menu - Slide down animation */}
-      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96' : 'max-h-0'}`}>
-        <div className="px-4 pb-4 bg-white shadow-md">
+      {/* Mobile menu */}
+      <div 
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-96' : 'max-h-0'}`}
+        style={{ backgroundColor: tempData.navbarStyle.backgroundColor }}
+      >
+        <div className="px-4 pb-4">
           <nav className="grid gap-y-4">
             {tempData.navigation.map((item, index) => (
               <a
