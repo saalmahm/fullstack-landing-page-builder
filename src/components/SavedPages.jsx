@@ -110,9 +110,16 @@ export default function SavedPages({ pages, onLoadPage, onDeletePage }) {
                       <Edit className="mr-2" size={16} />
                       Modifier
                     </button>
-                    <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200">
-                      <Eye size={16} />
-                    </button>
+                   <button
+  onClick={() => {
+    const pageToPreview = pages.find(p => p.id === page.id);
+    console.log("Page à prévisualiser:", pageToPreview);
+    alert(`Aperçu de "${pageToPreview.name}"\n(À implémenter)`);
+  }}
+  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+>
+  <Eye size={16} />
+</button>
                     <button
                       onClick={() => onDeletePage(page.id)}
                       className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
