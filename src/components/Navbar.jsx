@@ -1,7 +1,9 @@
-import React from 'react';
-import { Home, Palette, Save, Layers, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { Home, Palette, Save, Layers, Sparkles, Menu, X } from 'lucide-react';
 
 export default function Navbar({ currentPage, onNavigate, savedPagesCount }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   const navItems = [
     { id: 'home', label: 'Accueil', icon: Home },
     { id: 'builder', label: 'Builder', icon: Layers },
@@ -21,7 +23,7 @@ export default function Navbar({ currentPage, onNavigate, savedPagesCount }) {
             </div>
           </div>
 
-          {/* Navigation Items */}
+          {/* Navigation Items - Desktop */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navItems.map((item) => {
@@ -47,38 +49,47 @@ export default function Navbar({ currentPage, onNavigate, savedPagesCount }) {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button className="bg-gray-100 p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
-              <Layers size={24} />
+          <div className="md:hidden flex items-center">
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Menu"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
-      <div className="md:hidden bg-white border-t border-gray-200">
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentPage === item.id;
-            
-            return (
-              <button
-                key={item.id}
-                onClick={() => onNavigate(item.id)}
-                className={`flex items-center w-full px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
-                  isActive
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                <Icon size={20} className="mr-3" />
-                {item.label}
-              </button>
-            );
-          })}
+      {/* Mobile Navigation - Only shows when burger is clicked */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
+          <div className="px-2 pt-2 pb-4 space-y-1">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentPage === item.id;
+              
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    onNavigate(item.id);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center w-full px-3 py-3 rounded-md text-base font-medium transition-colors duration-200 ${
+                    isActive
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon size={20} className="mr-3" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 }
