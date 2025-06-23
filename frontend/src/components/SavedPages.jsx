@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Eye, Edit, Calendar, Search, Filter, Download } from 'lucide-react';
 import { api } from '../services/api';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 export default function SavedPages({ onLoadPage, onDeletePage }) {
   const [pages, setPages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('updatedAt');
   const [loading, setLoading] = useState(true);
+  const [selectedPage, setSelectedPage] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     loadPages();
@@ -24,15 +27,22 @@ export default function SavedPages({ onLoadPage, onDeletePage }) {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette page ?')) {
+  const handleDelete = async () => {
+    if (selectedPage) {
       try {
-        await api.deletePage(id);
+        await api.deletePage(selectedPage._id);
         loadPages();
+        setSelectedPage(null);
       } catch (error) {
         console.error('Error deleting page:', error);
+        alert('Une erreur est survenue lors de la suppression');
       }
     }
+  };
+
+  const handleDeletePage = (page) => {
+    setSelectedPage(page);
+    setShowDeleteModal(true);
   };
 
   const filteredPages = pages
@@ -57,23 +67,14 @@ export default function SavedPages({ onLoadPage, onDeletePage }) {
   };
 
   const handleExportJson = (page) => {
-    console.log('Exporting page:', page.name);
-    // Crée un blob JSON
     const json = JSON.stringify(page, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
-console.log('Blob créé:', blob);
-    console.log('JSON exporté:', json);
-    // Crée un URL temporaire
     const url = URL.createObjectURL(blob);
-
-    // Crée un lien et déclenche le téléchargement
     const a = document.createElement('a');
     a.href = url;
     a.download = `${page.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
-
-    // Nettoie
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
@@ -92,25 +93,26 @@ console.log('Blob créé:', blob);
     }
   };
 
-  const handleDeletePage = (pageId) => {
-    console.log('Deleting page:', pageId);
-    if (onDeletePage) {
-      onDeletePage(pageId);
-    } else {
-      if (confirm('Êtes-vous sûr de vouloir supprimer cette page ?')) {
-        alert(`Page ${pageId} supprimée`);
-      }
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Pages Sauvegardées</h1>
-          <p className="text-gray-600">
-            Gérez vos {pages.length} page{pages.length !== 1 ? 's' : ''} sauvegardée{pages.length !== 1 ? 's' : ''}
+    <>
+      {showDeleteModal && (
+        <DeleteConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setSelectedPage(null);
+          }}
+          onConfirm={handleDelete}
+          title={`Supprimer "${selectedPage?.name}"`}
+        />
+      )}
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Pages Sauvegardées</h1>
+            <p className="text-gray-600">
+              Gérez vos {pages.length} page{pages.length !== 1 ? 's' : ''} sauvegardée{pages.length !== 1 ? 's' : ''}
           </p>
         </div>
 
@@ -146,7 +148,7 @@ console.log('Blob créé:', blob);
         {filteredPages.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPages.map((page) => (
-              <div key={page.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+              <div key={page._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
                 {/* Preview */}
                 <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative">
                   <div className="text-6xl opacity-20">🎨</div>
@@ -182,7 +184,7 @@ console.log('Blob créé:', blob);
                   <div className="space-y-3">
                     {/* Bouton Modifier - Principal */}
                     <button
-                      onClick={() => handleLoadPage(page.id)}
+                      onClick={() => handleLoadPage(page._id)}
                       className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center font-medium"
                     >
                       <Edit className="mr-2" size={18} />
@@ -201,10 +203,10 @@ console.log('Blob créé:', blob);
                         Exporter
                       </button>
                       
-                      {/* Bouton Supprimer */}
+                      {/* Bouton Supprimer - Rouge et dangereux */}
                       <button
-                        onClick={() => handleDeletePage(page.id)}
-                        className="bg-red-100 text-red-700 px-4 py-3 rounded-lg hover:bg-red-200 transition-colors duration-200 flex flex-col items-center justify-center text-sm"
+                        onClick={() => handleDeletePage(page)}
+                        className="bg-red-100 text-red-700 px-4 py-3 rounded-lg hover:bg-red-200 transition-colors duration-200 flex flex-col items-center justify-center text-sm font-medium"
                         title="Supprimer la page"
                       >
                         <Trash2 size={18} className="mb-1" />
@@ -237,5 +239,6 @@ console.log('Blob créé:', blob);
         )}
       </div>
     </div>
+    </>
   );
 }
