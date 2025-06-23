@@ -6,6 +6,7 @@ import Preview from './Preview';
 import CodeView from './CodeView';
 import ThemePanel from './ThemePanel';
 import SaveModal from './SaveModal';
+import Notification from './Notification';
 
 export default function Builder({ initialProject, onSave }) {
   const [components, setComponents] = useState(initialProject?.components || []);
@@ -59,6 +60,10 @@ export default function Builder({ initialProject, onSave }) {
     });
   }, []);
 
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationType, setNotificationType] = useState('success');
+  const [notificationMessage, setNotificationMessage] = useState('');
+
   const handleSave = useCallback(async () => {
     try {
       const pageData = {
@@ -71,17 +76,22 @@ export default function Builder({ initialProject, onSave }) {
       if (initialProject?._id) {
         // Mettre à jour la page existante
         await api.updatePage(initialProject._id, pageData);
-        alert('Page mise à jour avec succès');
+        setNotificationType('success');
+        setNotificationMessage('Page mise à jour avec succès');
       } else {
         // Créer une nouvelle page
         const savedId = await api.createPage(pageData);
-        alert('Nouvelle page créée avec succès');
+        setNotificationType('success');
+        setNotificationMessage('Nouvelle page créée avec succès');
       }
       
       setShowSaveModal(false);
+      setShowNotification(true);
     } catch (error) {
       console.error('Error saving page:', error);
-      alert('Erreur lors de la sauvegarde de la page');
+      setNotificationType('error');
+      setNotificationMessage('Erreur lors de la sauvegarde de la page');
+      setShowNotification(true);
     }
   }, [components, theme, initialProject, newPageName]);
 
@@ -212,6 +222,14 @@ export default function Builder({ initialProject, onSave }) {
           onSave={handleSave}
           initialName={newPageName}
           onNameChange={setNewPageName}
+        />
+      )}
+
+      {showNotification && (
+        <Notification
+          message={notificationMessage}
+          type={notificationType}
+          duration={3000}
         />
       )}
     </div>
