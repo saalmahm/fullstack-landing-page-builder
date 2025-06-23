@@ -6,6 +6,7 @@ import HomePage from './components/HomePage';
 import Builder from './components/Builder';
 import ThemeGallery from './components/ThemeGallery';
 import SavedPages from './components/SavedPages';
+import { api } from './services/api';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -26,13 +27,17 @@ function App() {
     return newPage.id;
   }, [savedPages.length]);
 
-  const handleLoadPage = useCallback((pageId) => {
-    const page = savedPages.find(p => p.id === pageId);
-    if (page) {
-      setCurrentProject(page);
+  const handleLoadPage = useCallback(async (page) => {
+    try {
+      console.log('Loading page data:', page);
+      const response = await api.getPage(page._id);
+      setCurrentProject(response);
       setCurrentPage('builder');
+    } catch (error) {
+      console.error('Error loading page:', error);
+      alert('Erreur lors du chargement de la page');
     }
-  }, [savedPages]);
+  }, []);
 
   const handleDeletePage = useCallback((pageId) => {
     setSavedPages(prev => prev.filter(p => p.id !== pageId));

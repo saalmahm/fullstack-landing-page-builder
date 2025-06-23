@@ -84,12 +84,12 @@ export default function SavedPages({ onLoadPage, onDeletePage }) {
     alert(`Prévisualisation de la page: ${page.name}`);
   };
 
-  const handleLoadPage = (pageId) => {
-    console.log('Loading page:', pageId);
+  const handleLoadPage = (page) => {
+    console.log('Loading page:', page._id);
     if (onLoadPage) {
-      onLoadPage(pageId);
+      onLoadPage(page);
     } else {
-      alert(`Chargement de la page ID: ${pageId}`);
+      alert(`Chargement de la page: ${page.name}`);
     }
   };
 
@@ -184,7 +184,7 @@ export default function SavedPages({ onLoadPage, onDeletePage }) {
                   <div className="space-y-3">
                     {/* Bouton Modifier - Principal */}
                     <button
-                      onClick={() => handleLoadPage(page._id)}
+                      onClick={() => handleLoadPage(page)}
                       className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center font-medium"
                     >
                       <Edit className="mr-2" size={18} />
