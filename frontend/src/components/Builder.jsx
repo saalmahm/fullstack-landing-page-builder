@@ -219,7 +219,7 @@ export default function Builder({ initialProject, onSave }) {
         <SaveModal
           isOpen={showSaveModal}
           onClose={() => setShowSaveModal(false)}
-          onSave={handleSave}
+          onSave={(onNavigate) => handleSave(onNavigate)}
           initialName={newPageName}
           onNameChange={setNewPageName}
         />

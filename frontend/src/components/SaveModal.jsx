@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Save } from 'lucide-react';
 import { api } from '../services/api';
 
-export default function SaveModal({ onClose, onSave, initialName, onNameChange }) {
+export default function SaveModal({ onClose, onSave, initialName, onNameChange, onNavigate }) {
   const [name, setName] = useState(initialName || '');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -13,7 +13,7 @@ export default function SaveModal({ onClose, onSave, initialName, onNameChange }
     
     setIsSaving(true);
     try {
-      await onSave();
+      await onSave(onNavigate);
       onClose();
     } catch (error) {
       console.error('Error saving page:', error);

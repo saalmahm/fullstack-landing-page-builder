@@ -63,6 +63,7 @@ function App() {
           <Builder 
             initialProject={currentProject}
             onSave={handleSavePage}
+            onNavigate={setCurrentPage}
           />
         );
       case 'themes':
