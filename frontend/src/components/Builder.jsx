@@ -64,14 +64,25 @@ export default function Builder({ initialProject, onSave }) {
   const [notificationType, setNotificationType] = useState('success');
   const [notificationMessage, setNotificationMessage] = useState('');
 
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(async (onNavigate) => {
     try {
+      // Préparer les données pour la sauvegarde
       const pageData = {
         name: newPageName || initialProject?.name || 'Nouvelle Page',
-        components,
-        theme
+        theme: {
+          ...theme,
+          // Supprimer les propriétés vides ou inutiles
+          backgroundColor: theme.backgroundColor || '#FFFFFF',
+          textColor: theme.textColor || '#000000'
+        },
+        components: components.map(comp => ({
+          id: comp.id,
+          type: comp.type,
+          content: comp.content,
+          styles: comp.styles || {}
+        }))
       };
-      
+
       // Vérifier si nous avons un ID de page existante
       if (initialProject?._id) {
         // Mettre à jour la page existante
@@ -87,6 +98,13 @@ export default function Builder({ initialProject, onSave }) {
       
       setShowSaveModal(false);
       setShowNotification(true);
+      
+      // Rediriger vers la page des pages sauvegardées après une seconde
+      setTimeout(() => {
+        if (onNavigate) {
+          onNavigate('saved');
+        }
+      }, 1000);
     } catch (error) {
       console.error('Error saving page:', error);
       setNotificationType('error');
