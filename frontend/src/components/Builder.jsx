@@ -8,7 +8,7 @@ import ThemePanel from './ThemePanel';
 import SaveModal from './SaveModal';
 import Notification from './Notification';
 
-export default function Builder({ initialProject, onSave }) {
+export default function Builder({ initialProject, onSave, onNavigate }) {
   const [components, setComponents] = useState(initialProject?.components || []);
   const [isPreview, setIsPreview] = useState(false);
   const [showCode, setShowCode] = useState(false);  const [showTheme, setShowTheme] = useState(false);
@@ -70,17 +70,43 @@ export default function Builder({ initialProject, onSave }) {
       const pageData = {
         name: newPageName || initialProject?.name || 'Nouvelle Page',
         theme: {
-          ...theme,
-          // Supprimer les propriétés vides ou inutiles
+          primaryColor: theme.primaryColor || '#3B82F6',
+          secondaryColor: theme.secondaryColor || '#8B5CF6',
+          accentColor: theme.accentColor || '#F97316',
           backgroundColor: theme.backgroundColor || '#FFFFFF',
-          textColor: theme.textColor || '#000000'
+          textColor: theme.textColor || '#1F2937'
         },
         components: components.map(comp => ({
           id: comp.id,
           type: comp.type,
-          content: comp.content,
-          styles: comp.styles || {}
-        }))
+          content: {
+            ...comp.content,
+            // Supprimer les propriétés vides
+            ...(typeof comp.content.title === 'string' && comp.content.title.trim() ? { title: comp.content.title } : {}),
+            ...(typeof comp.content.subtitle === 'string' && comp.content.subtitle.trim() ? { subtitle: comp.content.subtitle } : {}),
+            ...(typeof comp.content.description === 'string' && comp.content.description.trim() ? { description: comp.content.description } : {}),
+            ...(typeof comp.content.text === 'string' && comp.content.text.trim() ? { text: comp.content.text } : {}),
+            ...(typeof comp.content.content === 'string' && comp.content.content.trim() ? { content: comp.content.content } : {}),
+            ...(Array.isArray(comp.content.features) && comp.content.features.length > 0 ? { features: comp.content.features } : {}),
+            ...(Array.isArray(comp.content.testimonials) && comp.content.testimonials.length > 0 ? { testimonials: comp.content.testimonials } : {}),
+            ...(typeof comp.content.image === 'string' && comp.content.image.trim() ? { image: comp.content.image } : {}),
+            ...(typeof comp.content.logo === 'string' && comp.content.logo.trim() ? { logo: comp.content.logo } : {}),
+            ...(Array.isArray(comp.content.navigation) && comp.content.navigation.length > 0 ? { navigation: comp.content.navigation } : {}),
+            ...(typeof comp.content.ctaText === 'string' && comp.content.ctaText.trim() ? { ctaText: comp.content.ctaText } : {})
+          },
+          styles: {
+            ...comp.styles,
+            // Supprimer les styles vides
+            ...(comp.styles?.padding ? { padding: comp.styles.padding } : {}),
+            ...(comp.styles?.margin ? { margin: comp.styles.margin } : {}),
+            ...(comp.styles?.borderRadius ? { borderRadius: comp.styles.borderRadius } : {}),
+            ...(comp.styles?.backgroundColor ? { backgroundColor: comp.styles.backgroundColor } : {}),
+            ...(comp.styles?.color ? { color: comp.styles.color } : {}),
+            ...(comp.styles?.fontSize ? { fontSize: comp.styles.fontSize } : {}),
+            ...(comp.styles?.fontWeight ? { fontWeight: comp.styles.fontWeight } : {}),
+            ...(comp.styles?.textAlign ? { textAlign: comp.styles.textAlign } : {})
+          }
+        })).filter(comp => Object.keys(comp.content).length > 0)
       };
 
       // Vérifier si nous avons un ID de page existante
@@ -98,13 +124,13 @@ export default function Builder({ initialProject, onSave }) {
       
       setShowSaveModal(false);
       setShowNotification(true);
-      
+
       // Rediriger vers la page des pages sauvegardées après une seconde
-      setTimeout(() => {
-        if (onNavigate) {
+      if (onNavigate) {
+        setTimeout(() => {
           onNavigate('saved');
-        }
-      }, 1000);
+        }, 1000);
+      }
     } catch (error) {
       console.error('Error saving page:', error);
       setNotificationType('error');
@@ -237,7 +263,7 @@ export default function Builder({ initialProject, onSave }) {
         <SaveModal
           isOpen={showSaveModal}
           onClose={() => setShowSaveModal(false)}
-          onSave={(onNavigate) => handleSave(onNavigate)}
+          onSave={() => handleSave(onNavigate)}
           initialName={newPageName}
           onNameChange={setNewPageName}
         />
