@@ -2,32 +2,18 @@ import React, { useState } from 'react';
 import { X, Save } from 'lucide-react';
 import { api } from '../services/api';
 
-export default function SaveModal({ onClose, pageData }) {
-  const [name, setName] = useState('');
+export default function SaveModal({ onClose, onSave, initialName, onNameChange }) {
+  const [name, setName] = useState(initialName || '');
   const [isSaving, setIsSaving] = useState(false);
 
-  if (!pageData) {
-    console.error('Page data is required');
-    return null;
-  }
+
 
   const handleSave = async () => {
     if (!name.trim()) return;
     
     setIsSaving(true);
     try {
-      const page = {
-        name: name.trim(),
-        components: Array.isArray(pageData.components) ? pageData.components : [],
-        theme: pageData.theme || {
-          primaryColor: '#3B82F6',
-          secondaryColor: '#8B5CF6',
-          accentColor: '#F97316',
-          backgroundColor: '#FFFFFF',
-          textColor: '#000000'
-        }
-      };
-      await api.createPage(page);
+      await onSave();
       onClose();
     } catch (error) {
       console.error('Error saving page:', error);
@@ -63,7 +49,12 @@ export default function SaveModal({ onClose, pageData }) {
           <input
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (onNameChange) {
+                onNameChange(e.target.value);
+              }
+            }}
             onKeyPress={handleKeyPress}
             placeholder="Ma super landing page"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -87,7 +87,10 @@ export default function SavedPages({ onLoadPage, onDeletePage }) {
   const handleLoadPage = (page) => {
     console.log('Loading page:', page._id);
     if (onLoadPage) {
-      onLoadPage(page);
+      onLoadPage({
+        ...page,
+        id: page._id  // Assurer que l'ID est disponible sous le nom 'id'
+      });
     } else {
       alert(`Chargement de la page: ${page.name}`);
     }

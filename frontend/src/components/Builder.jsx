@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { api } from '../services/api';
 import Sidebar from './Sidebar';
 import Canvas from './Canvas';
 import Preview from './Preview';
@@ -11,6 +12,7 @@ export default function Builder({ initialProject, onSave }) {
   const [isPreview, setIsPreview] = useState(false);
   const [showCode, setShowCode] = useState(false);  const [showTheme, setShowTheme] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [newPageName, setNewPageName] = useState('');
   const [theme, setTheme] = useState(initialProject?.theme || {
     primaryColor: '#3B82F6',
     secondaryColor: '#8B5CF6',
@@ -23,6 +25,7 @@ export default function Builder({ initialProject, onSave }) {
     if (initialProject) {
       setComponents(initialProject.components || []);
       setTheme(initialProject.theme || theme);
+      setNewPageName(initialProject.name || ''); // Initialiser le nom avec le nom existant
     }
   }, [initialProject]);
 
@@ -56,16 +59,31 @@ export default function Builder({ initialProject, onSave }) {
     });
   }, []);
 
-  const handleSave = useCallback((name) => {
-    const pageData = {
-      name,
-      components,
-      theme
-    };
-    const savedId = onSave(pageData);
-    setShowSaveModal(false);
-    return savedId;
-  }, [components, theme, onSave]);
+  const handleSave = useCallback(async () => {
+    try {
+      const pageData = {
+        name: newPageName || initialProject?.name || 'Nouvelle Page',
+        components,
+        theme
+      };
+      
+      // Vérifier si nous avons un ID de page existante
+      if (initialProject?._id) {
+        // Mettre à jour la page existante
+        await api.updatePage(initialProject._id, pageData);
+        alert('Page mise à jour avec succès');
+      } else {
+        // Créer une nouvelle page
+        const savedId = await api.createPage(pageData);
+        alert('Nouvelle page créée avec succès');
+      }
+      
+      setShowSaveModal(false);
+    } catch (error) {
+      console.error('Error saving page:', error);
+      alert('Erreur lors de la sauvegarde de la page');
+    }
+  }, [components, theme, initialProject, newPageName]);
 
   const getDefaultContent = (type) => {
     const defaults = {
@@ -189,11 +207,11 @@ export default function Builder({ initialProject, onSave }) {
 
       {showSaveModal && (
         <SaveModal
+          isOpen={showSaveModal}
           onClose={() => setShowSaveModal(false)}
-          pageData={{
-            components: components,
-            theme: theme
-          }}
+          onSave={handleSave}
+          initialName={newPageName}
+          onNameChange={setNewPageName}
         />
       )}
     </div>
