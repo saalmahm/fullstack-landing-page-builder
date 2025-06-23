@@ -189,9 +189,11 @@ export default function Builder({ initialProject, onSave }) {
 
       {showSaveModal && (
         <SaveModal
-          onSave={handleSave}
           onClose={() => setShowSaveModal(false)}
-          initialName={initialProject?.name}
+          pageData={{
+            components: components,
+            theme: theme
+          }}
         />
       )}
     </div>

@@ -1,35 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2, Eye, Edit, Calendar, Search, Filter, Download } from 'lucide-react';
+import { api } from '../services/api';
 
-// Données de test pour voir les boutons
-const samplePages = [
-  {
-    id: '1',
-    name: 'Ma première page',
-    createdAt: '2025-06-20T10:00:00Z',
-    updatedAt: '2025-06-20T16:05:00Z',
-    theme: {
-      primaryColor: '#3B82F6',
-      secondaryColor: '#8B5CF6',
-      accentColor: '#F97316'
-    }
-  },
-  {
-    id: '2',
-    name: 'Page de présentation',
-    createdAt: '2025-06-19T14:30:00Z',
-    updatedAt: '2025-06-20T12:20:00Z',
-    theme: {
-      primaryColor: '#EF4444',
-      secondaryColor: '#10B981',
-      accentColor: '#F59E0B'
-    }
-  }
-];
-
-export default function SavedPages({ pages = samplePages, onLoadPage, onDeletePage }) {
+export default function SavedPages({ onLoadPage, onDeletePage }) {
+  const [pages, setPages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('updatedAt');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadPages();
+  }, []);
+
+  const loadPages = async () => {
+    try {
+      setLoading(true);
+      const response = await api.getPages();
+      setPages(response.pages);
+    } catch (error) {
+      console.error('Error loading pages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette page ?')) {
+      try {
+        await api.deletePage(id);
+        loadPages();
+      } catch (error) {
+        console.error('Error deleting page:', error);
+      }
+    }
+  };
 
   const filteredPages = pages
     .filter(page =>
@@ -57,7 +61,8 @@ export default function SavedPages({ pages = samplePages, onLoadPage, onDeletePa
     // Crée un blob JSON
     const json = JSON.stringify(page, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
-
+console.log('Blob créé:', blob);
+    console.log('JSON exporté:', json);
     // Crée un URL temporaire
     const url = URL.createObjectURL(blob);
 

@@ -1,16 +1,37 @@
 import React, { useState } from 'react';
 import { X, Save } from 'lucide-react';
+import { api } from '../services/api';
 
-export default function SaveModal({ onSave, onClose, initialName = '' }) {
-  const [name, setName] = useState(initialName);
+export default function SaveModal({ onClose, pageData }) {
+  const [name, setName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  if (!pageData) {
+    console.error('Page data is required');
+    return null;
+  }
 
   const handleSave = async () => {
     if (!name.trim()) return;
     
     setIsSaving(true);
     try {
-      await onSave(name.trim());
+      const page = {
+        name: name.trim(),
+        components: Array.isArray(pageData.components) ? pageData.components : [],
+        theme: pageData.theme || {
+          primaryColor: '#3B82F6',
+          secondaryColor: '#8B5CF6',
+          accentColor: '#F97316',
+          backgroundColor: '#FFFFFF',
+          textColor: '#000000'
+        }
+      };
+      await api.createPage(page);
+      onClose();
+    } catch (error) {
+      console.error('Error saving page:', error);
+      alert('Erreur lors de la sauvegarde de la page. Veuillez réessayer.');
     } finally {
       setIsSaving(false);
     }
@@ -50,26 +71,29 @@ export default function SaveModal({ onSave, onClose, initialName = '' }) {
           />
         </div>
 
-        <div className="flex gap-3">
-          <button
-            onClick={handleSave}
-            disabled={!name.trim() || isSaving}
-            className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
-          >
-            {isSaving ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            ) : (
-              <>
-                <Save className="mr-2" size={20} />
-                Sauvegarder
-              </>
-            )}
-          </button>
+        <div className="flex justify-end space-x-4">
           <button
             onClick={onClose}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200"
+            className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors duration-200"
           >
             Annuler
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={isSaving || !name.trim()}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving ? (
+              <div className="flex items-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                <span>Sauvegarde...</span>
+              </div>
+            ) : (
+              <div className="flex items-center">
+                <Save size={20} className="mr-2" />
+                <span>Sauvegarder</span>
+              </div>
+            )}
           </button>
         </div>
       </div>
