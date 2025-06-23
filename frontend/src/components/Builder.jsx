@@ -35,7 +35,7 @@ export default function Builder({ initialProject, onSave }) {
     };
     setComponents(prev => [...prev, newComponent]);
   }, []);
-
+ 
   const updateComponent = useCallback((id, content) => {
     setComponents(prev =>
       prev.map(comp => comp.id === id ? { ...comp, content } : comp)
