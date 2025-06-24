@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Navbar from './components/Navbar';
@@ -12,6 +12,19 @@ function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [savedPages, setSavedPages] = useState([]);
   const [currentProject, setCurrentProject] = useState(null);
+
+  useEffect(() => {
+    const loadSavedPages = async () => {
+      try {
+        const response = await api.getPages();
+        console.log('Pages chargées:', response);
+        setSavedPages(response.pages || []); // Utiliser response.pages au lieu de response
+      } catch (error) {
+        console.error('Error loading saved pages:', error);
+      }
+    };
+    loadSavedPages();
+  }, []);
 
   const handleSavePage = useCallback((pageData) => {
     const newPage = {

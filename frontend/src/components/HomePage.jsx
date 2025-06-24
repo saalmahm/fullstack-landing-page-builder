@@ -2,6 +2,8 @@ import React from 'react';
 import { Plus, Zap, Palette, Code, ArrowRight, Star, Users, Layers } from 'lucide-react';
 
 export default function HomePage({ onNewProject, onLoadProject, savedPages = [] }) {
+  // Vérifier si savedPages est un objet avec des pages
+  const pages = Array.isArray(savedPages) ? savedPages : (savedPages?.pages || []);
   const features = [
     {
       icon: Zap,
@@ -25,7 +27,7 @@ export default function HomePage({ onNewProject, onLoadProject, savedPages = [] 
     }
   ];
 
-  const recentPages = savedPages.slice(-3);
+  const recentPages = pages.slice(-3);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
