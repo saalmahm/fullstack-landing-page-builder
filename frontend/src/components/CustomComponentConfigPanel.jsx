@@ -205,7 +205,7 @@ export default function CustomComponentConfigPanel({ onSave, onClose }) {
           <h5 className="text-sm font-medium">{element.label}</h5>
           <button
             onClick={() => {
-              moveElement(index, null);
+              setElements(prev => prev.filter((el, i) => i !== index));
             }}
             className="text-red-500 hover:text-red-700"
           >
