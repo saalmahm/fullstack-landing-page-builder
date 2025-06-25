@@ -7,6 +7,7 @@ import CodeView from './CodeView';
 import ThemePanel from './ThemePanel';
 import SaveModal from './SaveModal';
 import Notification from './Notification';
+import CustomComponentConfigPanel from './CustomComponentConfigPanel';
 
 export default function Builder({ initialProject, onSave, onNavigate }) {
   const [components, setComponents] = useState(initialProject?.components || []);
@@ -14,6 +15,7 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
   const [showCode, setShowCode] = useState(false);  const [showTheme, setShowTheme] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [newPageName, setNewPageName] = useState('');
+  const [showCustomConfigPanel, setShowCustomConfigPanel] = useState(false);
   const [theme, setTheme] = useState(initialProject?.theme || {
     primaryColor: '#3B82F6',
     secondaryColor: '#8B5CF6',
@@ -33,13 +35,17 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
   }, [initialProject]);
 
   const addComponent = useCallback((type) => {
-    const newComponent = {
-      id: `${type}-${Date.now()}`,
-      type,
-      content: getDefaultContent(type),
-      styles: {}
-    };
-    setComponents(prev => [...prev, newComponent]);
+    if (type === 'custom') {
+      setShowCustomConfigPanel(true);
+    } else {
+      const newComponent = {
+        id: `${type}-${Date.now()}`,
+        type,
+        content: getDefaultContent(type),
+        styles: {}
+      };
+      setComponents(prev => [...prev, newComponent]);
+    }
   }, []);
  
   const updateComponent = useCallback((id, content) => {
@@ -229,6 +235,22 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
         onSave={() => setShowSaveModal(true)}
         isPreview={isPreview}
       />
+
+      {showCustomConfigPanel && (
+        <CustomComponentConfigPanel
+          onSave={(elements) => {
+            const newComponent = {
+              id: `custom-${Date.now()}`,
+              type: 'custom',
+              content: { elements },
+              styles: {}
+            };
+            setComponents(prev => [...prev, newComponent]);
+            setShowCustomConfigPanel(false);
+          }}
+          onClose={() => setShowCustomConfigPanel(false)}
+        />
+      )}
 
       <div className="flex-1 flex flex-col">
         {showCode ? (

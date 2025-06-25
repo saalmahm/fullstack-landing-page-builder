@@ -87,10 +87,10 @@ export default function HomePage({ onNewProject, onLoadProject, savedPages = [] 
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => {
+            {features.map((feature) => {
               const Icon = feature.icon;
               return (
-                <div key={index} className="group text-center p-6 rounded-2xl hover:bg-gray-50 transition-all duration-300 hover:shadow-lg">
+                <div key={feature.title} className="group text-center p-6 rounded-2xl hover:bg-gray-50 transition-all duration-300 hover:shadow-lg">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
                     <Icon className="text-white" size={32} />
                   </div>
@@ -117,8 +117,8 @@ export default function HomePage({ onNewProject, onLoadProject, savedPages = [] 
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {recentPages.map((page) => (
-                <div key={page.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+              {recentPages.map((page, index) => (
+                <div key={`recent-project-${page.id || 'temp-' + index}`} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
                   <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
                     <Layers size={48} className="text-blue-500 group-hover:scale-110 transition-transform duration-300" />
                   </div>
