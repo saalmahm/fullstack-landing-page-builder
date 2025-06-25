@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { X, Plus, Text, Image, Video, Heading, Link, AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Italic, Underline, List, ListOrdered, Quote, VideoIcon, Minus, Maximize2, Minimize2 } from 'lucide-react';
+import { X, Plus, Text, Image, Video, Heading, Link, AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Italic, Underline, List, ListOrdered, Quote, VideoIcon, Minus, Maximize2, Minimize2, Check } from 'lucide-react';
 import { useDrag, useDrop } from 'react-dnd';
 
 const ELEMENT_TYPES = [
@@ -260,12 +260,22 @@ export default function CustomComponentConfigPanel({ onSave, onClose }) {
 
         {/* Bouton de sauvegarde */}
         <div className="mt-8">
-          <button
-            onClick={() => onSave(elements)}
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            Sauvegarder le composant
-          </button>
+          <div className="flex gap-4">
+            <button
+              onClick={onClose}
+              className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center justify-center"
+            >
+              <X className="mr-2" size={16} />
+              Annuler
+            </button>
+            <button
+              onClick={() => onSave(elements)}
+              className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center"
+            >
+              <Check className="mr-2" size={16} />
+              Sauvegarder
+            </button>
+          </div>
         </div>
       </div>
     </div>
