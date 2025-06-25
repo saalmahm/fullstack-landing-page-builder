@@ -21,6 +21,8 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
     backgroundColor: '#FFFFFF',
     textColor: '#1F2937'
   });
+  const [previewTheme, setPreviewTheme] = useState(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (initialProject) {

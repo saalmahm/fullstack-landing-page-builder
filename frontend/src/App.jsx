@@ -61,6 +61,26 @@ function App() {
     setCurrentPage('builder');
   }, []);
 
+  const handleThemeSelect = useCallback((theme) => {
+    // Mettre à jour le projet courant avec le nouveau thème
+    setCurrentProject(prev => ({
+      ...prev,
+      theme: {
+        primaryColor: theme.primaryColor || '#3B82F6',
+        secondaryColor: theme.secondaryColor || '#8B5CF6',
+        accentColor: theme.accentColor || '#F97316',
+        backgroundColor: theme.backgroundColor || '#FFFFFF',
+        textColor: theme.textColor || '#1F2937'
+      }
+    }));
+    
+    // Redirection vers le builder
+    setCurrentPage('builder');
+    
+    // Sauvegarder le thème dans le localStorage pour la persistance
+    localStorage.setItem('currentTheme', JSON.stringify(theme));
+  }, []);
+
   const renderCurrentPage = () => {
     switch (currentPage) {
       case 'home':

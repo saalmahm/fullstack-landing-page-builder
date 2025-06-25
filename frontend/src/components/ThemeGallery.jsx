@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
 import { Palette, Eye, Download } from 'lucide-react';
 
-export default function ThemeGallery({ onSelectTheme }) {
+export default function ThemeGallery({ onSelectTheme, currentTheme }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [previewMode, setPreviewMode] = useState(false);
+  const [previewTheme, setPreviewTheme] = useState(null);
+
+  const handleThemePreview = (theme) => {
+    setPreviewTheme(theme);
+    setPreviewMode(true);
+  };
+
+  const handleThemeSelect = (theme) => {
+    onSelectTheme(theme);
+    setPreviewMode(false);
+    setPreviewTheme(null);
+  };
 
   const themes = [
     {
@@ -173,7 +186,7 @@ export default function ThemeGallery({ onSelectTheme }) {
                     Aperçu
                   </button>
                   <button 
-                    onClick={() => onSelectTheme(theme.colors)}
+                    onClick={() => handleThemePreview(theme)}
                     className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
                   >
                     <Download className="mr-2" size={16} />

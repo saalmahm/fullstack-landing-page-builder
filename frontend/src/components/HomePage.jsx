@@ -128,7 +128,7 @@ export default function HomePage({ onNewProject, onLoadProject, savedPages = [] 
                       Modifié le {new Date(page.updatedAt).toLocaleDateString('fr-FR')}
                     </p>
                     <button
-                      onClick={() => onLoadProject(page.id)}
+                      onClick={() => onLoadProject(page)}
                       className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
                     >
                       Ouvrir le projet
