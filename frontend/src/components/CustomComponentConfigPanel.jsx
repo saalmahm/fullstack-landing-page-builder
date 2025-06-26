@@ -32,13 +32,15 @@ const CustomComponentConfigPanel = ({ onSave, onClose }) => {
 
   const handleAddElement = (type) => {
     const newElement = {
+      id: `element-${Date.now()}-${type}`,
       type,
       content: {
         text: '',
         heading: '',
         image: '',
         video: '',
-        button: { text: '', link: '' }
+        button: { text: '', link: '' },
+        alt: '' // Pour les images
       },
       styles: {
         backgroundColor: '#FFFFFF',
@@ -46,7 +48,12 @@ const CustomComponentConfigPanel = ({ onSave, onClose }) => {
         padding: '16px',
         margin: '16px',
         borderRadius: '4px',
-        textAlign: 'left'
+        textAlign: 'left',
+        fontSize: '16px',
+        fontWeight: 'normal',
+        lineHeight: '1.5',
+        letterSpacing: '0',
+        textDecoration: 'none'
       }
     };
     setElements(prev => [...prev, newElement]);
@@ -116,50 +123,127 @@ const CustomComponentConfigPanel = ({ onSave, onClose }) => {
     switch (element.type) {
       case 'text':
         return (
-          <textarea
-            ref={elementRefs.text}
-            id={`text-${index}`}
-            name={`text-${index}`}
-            value={element.content.text}
-            onChange={(e) => {
-              elementHandlers.text(e, index);
-              elementRefs.text.current.focus();
-            }}
-            className="w-full p-2 border rounded"
-            placeholder="Entrez du texte..."
-          />
+          <div className="space-y-2">
+            <textarea
+              ref={elementRefs.text}
+              id={`text-${index}`}
+              name={`text-${index}`}
+              value={element.content.text}
+              onChange={(e) => {
+                elementHandlers.text(e, index);
+                elementRefs.text.current.focus();
+              }}
+              className="w-full p-2 border rounded"
+              placeholder="Entrez du texte..."
+            />
+            <div className="flex gap-2">
+              <select
+                value={element.styles.fontSize}
+                onChange={(e) => {
+                  setElements(prev => prev.map((el, i) => 
+                    i === index ? { ...el, styles: { ...el.styles, fontSize: e.target.value } } : el
+                  ));
+                }}
+                className="p-2 border rounded"
+              >
+                <option value="12px">Petit</option>
+                <option value="16px">Normal</option>
+                <option value="20px">Grand</option>
+              </select>
+              <select
+                value={element.styles.fontWeight}
+                onChange={(e) => {
+                  setElements(prev => prev.map((el, i) => 
+                    i === index ? { ...el, styles: { ...el.styles, fontWeight: e.target.value } } : el
+                  ));
+                }}
+                className="p-2 border rounded"
+              >
+                <option value="normal">Normal</option>
+                <option value="bold">Gras</option>
+                <option value="600">Semi-gras</option>
+              </select>
+            </div>
+          </div>
         );
       case 'heading':
         return (
-          <input
-            ref={elementRefs.heading}
-            id={`heading-${index}`}
-            name={`heading-${index}`}
-            type="text"
-            value={element.content.heading}
-            onChange={(e) => {
-              elementHandlers.heading(e, index);
-              elementRefs.heading.current.focus();
-            }}
-            className="w-full p-2 border rounded"
-            placeholder="Entrez un titre..."
-          />
+          <div className="space-y-2">
+            <input
+              ref={elementRefs.heading}
+              id={`heading-${index}`}
+              name={`heading-${index}`}
+              type="text"
+              value={element.content.heading}
+              onChange={(e) => {
+                elementHandlers.heading(e, index);
+                elementRefs.heading.current.focus();
+              }}
+              className="w-full p-2 border rounded"
+              placeholder="Entrez un titre..."
+            />
+            <div className="flex gap-2">
+              <select
+                value={element.styles.fontSize}
+                onChange={(e) => {
+                  setElements(prev => prev.map((el, i) => 
+                    i === index ? { ...el, styles: { ...el.styles, fontSize: e.target.value } } : el
+                  ));
+                }}
+                className="p-2 border rounded"
+              >
+                <option value="24px">Titre 1</option>
+                <option value="32px">Titre 2</option>
+                <option value="40px">Titre 3</option>
+              </select>
+              <select
+                value={element.styles.fontWeight}
+                onChange={(e) => {
+                  setElements(prev => prev.map((el, i) => 
+                    i === index ? { ...el, styles: { ...el.styles, fontWeight: e.target.value } } : el
+                  ));
+                }}
+                className="p-2 border rounded"
+              >
+                <option value="bold">Gras</option>
+                <option value="600">Semi-gras</option>
+              </select>
+            </div>
+          </div>
         );
       case 'image':
         return (
-          <input
-            ref={elementRefs.image}
-            id={`image-${index}`}
-            name={`image-${index}`}
-            type="text"
-            value={element.content.image}
-            onChange={(e) => {
-              elementHandlers.image(e, index);
-              elementRefs.image.current.focus();
-            }}
-            className="w-full p-2 border rounded"
-            placeholder="URL de l'image..."
-          />
+          <div className="space-y-2">
+            <input
+              ref={elementRefs.image}
+              id={`image-${index}`}
+              name={`image-${index}`}
+              type="text"
+              value={element.content.image}
+              onChange={(e) => {
+                elementHandlers.image(e, index);
+                elementRefs.image.current.focus();
+              }}
+              className="w-full p-2 border rounded"
+              placeholder="URL de l'image..."
+              aria-label="URL de l'image"
+            />
+            <input
+              ref={elementRefs.alt}
+              id={`alt-${index}`}
+              name={`alt-${index}`}
+              type="text"
+              value={element.content.alt}
+              onChange={(e) => {
+                setElements(prev => prev.map((el, i) => 
+                  i === index ? { ...el, content: { ...el.content, alt: e.target.value } } : el
+                ));
+              }}
+              className="w-full p-2 border rounded"
+              placeholder="Texte alternatif..."
+              aria-label="Texte alternatif de l'image"
+            />
+          </div>
         );
       case 'video':
         return (
@@ -175,6 +259,7 @@ const CustomComponentConfigPanel = ({ onSave, onClose }) => {
             }}
             className="w-full p-2 border rounded"
             placeholder="URL de la vidéo..."
+            aria-label="URL de la vidéo"
           />
         );
       case 'button':
@@ -192,6 +277,7 @@ const CustomComponentConfigPanel = ({ onSave, onClose }) => {
               }}
               className="w-full p-2 border rounded"
               placeholder="Texte du bouton..."
+              aria-label="Texte du bouton"
             />
             <input
               ref={elementRefs.buttonLink}
@@ -205,7 +291,24 @@ const CustomComponentConfigPanel = ({ onSave, onClose }) => {
               }}
               className="w-full p-2 border rounded"
               placeholder="Lien du bouton..."
+              aria-label="Lien du bouton"
             />
+            <div className="flex gap-2">
+              <select
+                value={element.styles.backgroundColor}
+                onChange={(e) => {
+                  setElements(prev => prev.map((el, i) => 
+                    i === index ? { ...el, styles: { ...el.styles, backgroundColor: e.target.value } } : el
+                  ));
+                }}
+                className="p-2 border rounded"
+              >
+                <option value="#0070f3">Bleu</option>
+                <option value="#2563eb">Bleu foncé</option>
+                <option value="#10b981">Vert</option>
+                <option value="#f97316">Orange</option>
+              </select>
+            </div>
           </div>
         );
       default:
@@ -231,6 +334,8 @@ const CustomComponentConfigPanel = ({ onSave, onClose }) => {
     };
     onSave(component);
   };
+
+
 
   const handleCancel = () => {
     onClose();

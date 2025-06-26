@@ -6,8 +6,7 @@ const componentTypes = [
   { type: 'features', label: 'Fonctionnalités', icon: '✨' },
   { type: 'testimonials', label: 'Témoignages', icon: '💬' },
   { type: 'cta', label: 'Call to Action', icon: '🎯' },
-  { type: 'footer', label: 'Pied de page', icon: '📋' },
-  { type: 'custom', label: 'Composant Personnalisé', icon: '🎨' }
+  { type: 'footer', label: 'Pied de page', icon: '📋' }
 ];
 
 export default function Sidebar({ 

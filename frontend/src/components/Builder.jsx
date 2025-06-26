@@ -7,7 +7,6 @@ import CodeView from './CodeView';
 import ThemePanel from './ThemePanel';
 import SaveModal from './SaveModal';
 import Notification from './Notification';
-import CustomComponentConfigPanel from './CustomComponentConfigPanel';
 
 export default function Builder({ initialProject, onSave, onNavigate }) {
   const [components, setComponents] = useState(initialProject?.components || []);
@@ -15,7 +14,7 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
   const [showCode, setShowCode] = useState(false);  const [showTheme, setShowTheme] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [newPageName, setNewPageName] = useState('');
-  const [showCustomConfigPanel, setShowCustomConfigPanel] = useState(false);
+
   const [theme, setTheme] = useState(initialProject?.theme || {
     primaryColor: '#3B82F6',
     secondaryColor: '#8B5CF6',
@@ -35,17 +34,13 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
   }, [initialProject]);
 
   const addComponent = useCallback((type) => {
-    if (type === 'custom') {
-      setShowCustomConfigPanel(true);
-    } else {
-      const newComponent = {
-        id: `${type}-${Date.now()}`,
-        type,
-        content: getDefaultContent(type),
-        styles: {}
-      };
-      setComponents(prev => [...prev, newComponent]);
-    }
+    const newComponent = {
+      id: `${type}-${Date.now()}`,
+      type,
+      content: getDefaultContent(type),
+      styles: {}
+    };
+    setComponents(prev => [...prev, newComponent]);
   }, []);
  
   const updateComponent = useCallback((id, content) => {
@@ -75,6 +70,7 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
   const handleSave = useCallback(async (onNavigate) => {
     try {
       // Préparer les données pour la sauvegarde
+      console.log('Components avant sauvegarde:', components);
       const pageData = {
         name: newPageName || initialProject?.name || 'Nouvelle Page',
         theme: {
@@ -84,37 +80,37 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
           backgroundColor: theme.backgroundColor || '#FFFFFF',
           textColor: theme.textColor || '#1F2937'
         },
-        components: components.map(comp => ({
-          id: comp.id,
-          type: comp.type,
-          content: {
-            ...comp.content,
-            // Supprimer les propriétés vides
-            ...(typeof comp.content.title === 'string' && comp.content.title.trim() ? { title: comp.content.title } : {}),
-            ...(typeof comp.content.subtitle === 'string' && comp.content.subtitle.trim() ? { subtitle: comp.content.subtitle } : {}),
-            ...(typeof comp.content.description === 'string' && comp.content.description.trim() ? { description: comp.content.description } : {}),
-            ...(typeof comp.content.text === 'string' && comp.content.text.trim() ? { text: comp.content.text } : {}),
-            ...(typeof comp.content.content === 'string' && comp.content.content.trim() ? { content: comp.content.content } : {}),
-            ...(Array.isArray(comp.content.features) && comp.content.features.length > 0 ? { features: comp.content.features } : {}),
-            ...(Array.isArray(comp.content.testimonials) && comp.content.testimonials.length > 0 ? { testimonials: comp.content.testimonials } : {}),
-            ...(typeof comp.content.image === 'string' && comp.content.image.trim() ? { image: comp.content.image } : {}),
-            ...(typeof comp.content.logo === 'string' && comp.content.logo.trim() ? { logo: comp.content.logo } : {}),
-            ...(Array.isArray(comp.content.navigation) && comp.content.navigation.length > 0 ? { navigation: comp.content.navigation } : {}),
-            ...(typeof comp.content.ctaText === 'string' && comp.content.ctaText.trim() ? { ctaText: comp.content.ctaText } : {})
-          },
-          styles: {
-            ...comp.styles,
-            // Supprimer les styles vides
-            ...(comp.styles?.padding ? { padding: comp.styles.padding } : {}),
-            ...(comp.styles?.margin ? { margin: comp.styles.margin } : {}),
-            ...(comp.styles?.borderRadius ? { borderRadius: comp.styles.borderRadius } : {}),
-            ...(comp.styles?.backgroundColor ? { backgroundColor: comp.styles.backgroundColor } : {}),
-            ...(comp.styles?.color ? { color: comp.styles.color } : {}),
-            ...(comp.styles?.fontSize ? { fontSize: comp.styles.fontSize } : {}),
-            ...(comp.styles?.fontWeight ? { fontWeight: comp.styles.fontWeight } : {}),
-            ...(comp.styles?.textAlign ? { textAlign: comp.styles.textAlign } : {})
-          }
-        })).filter(comp => Object.keys(comp.content).length > 0)
+        components: components.map(comp => {
+          // Pour les autres composants, garder la logique existante
+          return {
+            id: comp.id,
+            type: comp.type,
+            content: {
+              ...comp.content,
+              // Supprimer les propriétés vides
+              ...(typeof comp.content.title === 'string' && comp.content.title.trim() ? { title: comp.content.title } : {}),
+              ...(typeof comp.content.subtitle === 'string' && comp.content.subtitle.trim() ? { subtitle: comp.content.subtitle } : {}),
+              ...(Array.isArray(comp.content.features) && comp.content.features.length > 0 ? { features: comp.content.features } : {}),
+              ...(Array.isArray(comp.content.testimonials) && comp.content.testimonials.length > 0 ? { testimonials: comp.content.testimonials } : {}),
+              ...(typeof comp.content.image === 'string' && comp.content.image.trim() ? { image: comp.content.image } : {}),
+              ...(typeof comp.content.logo === 'string' && comp.content.logo.trim() ? { logo: comp.content.logo } : {}),
+              ...(Array.isArray(comp.content.navigation) && comp.content.navigation.length > 0 ? { navigation: comp.content.navigation } : {}),
+              ...(typeof comp.content.ctaText === 'string' && comp.content.ctaText.trim() ? { ctaText: comp.content.ctaText } : {})
+            },
+            styles: {
+              ...comp.styles,
+              // Supprimer les styles vides
+              ...(comp.styles?.padding ? { padding: comp.styles.padding } : {}),
+              ...(comp.styles?.margin ? { margin: comp.styles.margin } : {}),
+              ...(comp.styles?.borderRadius ? { borderRadius: comp.styles.borderRadius } : {}),
+              ...(comp.styles?.backgroundColor ? { backgroundColor: comp.styles.backgroundColor } : {}),
+              ...(comp.styles?.color ? { color: comp.styles.color } : {}),
+              ...(comp.styles?.fontSize ? { fontSize: comp.styles.fontSize } : {}),
+              ...(comp.styles?.fontWeight ? { fontWeight: comp.styles.fontWeight } : {}),
+              ...(comp.styles?.textAlign ? { textAlign: comp.styles.textAlign } : {})
+            }
+          };
+        }).filter(comp => Object.keys(comp.content).length > 0)
       };
 
       // Vérifier si nous avons un ID de page existante
@@ -236,21 +232,7 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
         isPreview={isPreview}
       />
 
-      {showCustomConfigPanel && (
-        <CustomComponentConfigPanel
-          onSave={(elements) => {
-            const newComponent = {
-              id: `custom-${Date.now()}`,
-              type: 'custom',
-              content: { elements },
-              styles: {}
-            };
-            setComponents(prev => [...prev, newComponent]);
-            setShowCustomConfigPanel(false);
-          }}
-          onClose={() => setShowCustomConfigPanel(false)}
-        />
-      )}
+
 
       <div className="flex-1 flex flex-col">
         {showCode ? (
