@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { X, Plus, Text, Image, Video, Heading, Link, AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Italic, Underline, List, ListOrdered, Quote, VideoIcon, Minus, Maximize2, Minimize2, Check } from 'lucide-react';
 import { useDrag, useDrop } from 'react-dnd';
+import { X, Plus, Text, Image, Video, Heading, Link, AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Italic, Underline, List, ListOrdered, Quote, VideoIcon, Minus, Maximize2, Minimize2, Check } from 'lucide-react';
 
 const ELEMENT_TYPES = [
   { type: 'text', label: 'Texte', icon: <Text /> },
@@ -14,7 +14,7 @@ const ELEMENT_TYPES = [
   { type: 'text_editor', label: 'Éditeur de Texte', icon: <AlignLeft /> }
 ];
 
-export default function CustomComponentConfigPanel({ onSave, onClose }) {
+const CustomComponentConfigPanel = ({ onSave, onClose }) => {
   const [elements, setElements] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
 
@@ -52,18 +52,78 @@ export default function CustomComponentConfigPanel({ onSave, onClose }) {
     setElements(prev => [...prev, newElement]);
   };
 
-  const renderElementContent = (element) => {
+  const refs = {
+    text: useRef(null),
+    heading: useRef(null),
+    image: useRef(null),
+    video: useRef(null),
+    buttonText: useRef(null),
+    buttonLink: useRef(null)
+  };
+
+  const handlers = {
+    text: useCallback((e, index) => {
+      setElements(prev => prev.map((el, i) => 
+        i === index ? { ...el, content: { ...el.content, text: e.target.value } } : el
+      ));
+    }, []),
+    heading: useCallback((e, index) => {
+      setElements(prev => prev.map((el, i) => 
+        i === index ? { ...el, content: { ...el.content, heading: e.target.value } } : el
+      ));
+    }, []),
+    image: useCallback((e, index) => {
+      setElements(prev => prev.map((el, i) => 
+        i === index ? { ...el, content: { ...el.content, image: e.target.value } } : el
+      ));
+    }, []),
+    video: useCallback((e, index) => {
+      setElements(prev => prev.map((el, i) => 
+        i === index ? { ...el, content: { ...el.content, video: e.target.value } } : el
+      ));
+    }, []),
+    buttonText: useCallback((e, index) => {
+      setElements(prev => prev.map((el, i) => 
+        i === index ? { ...el, content: { ...el.content, button: { ...el.content.button, text: e.target.value } } } : el
+      ));
+    }, []),
+    buttonLink: useCallback((e, index) => {
+      setElements(prev => prev.map((el, i) => 
+        i === index ? { ...el, content: { ...el.content, button: { ...el.content.button, link: e.target.value } } } : el
+      ));
+    }, [])
+  };
+
+  const elementRefs = {
+    text: refs.text,
+    heading: refs.heading,
+    image: refs.image,
+    video: refs.video,
+    buttonText: refs.buttonText,
+    buttonLink: refs.buttonLink
+  };
+
+  const elementHandlers = {
+    text: handlers.text,
+    heading: handlers.heading,
+    image: handlers.image,
+    video: handlers.video,
+    buttonText: handlers.buttonText,
+    buttonLink: handlers.buttonLink
+  };
+
+  const renderElementContent = (element, index) => {
     switch (element.type) {
       case 'text':
         return (
           <textarea
-            id={`text-${element.index}`}
-            name={`text-${element.index}`}
+            ref={elementRefs.text}
+            id={`text-${index}`}
+            name={`text-${index}`}
             value={element.content.text}
             onChange={(e) => {
-              setElements(prev => prev.map((el, i) => 
-                i === element.index ? { ...el, content: { ...el.content, text: e.target.value } } : el
-              ));
+              elementHandlers.text(e, index);
+              elementRefs.text.current.focus();
             }}
             className="w-full p-2 border rounded"
             placeholder="Entrez du texte..."
@@ -72,14 +132,14 @@ export default function CustomComponentConfigPanel({ onSave, onClose }) {
       case 'heading':
         return (
           <input
-            id={`heading-${element.index}`}
-            name={`heading-${element.index}`}
+            ref={elementRefs.heading}
+            id={`heading-${index}`}
+            name={`heading-${index}`}
             type="text"
             value={element.content.heading}
             onChange={(e) => {
-              setElements(prev => prev.map((el, i) => 
-                i === element.index ? { ...el, content: { ...el.content, heading: e.target.value } } : el
-              ));
+              elementHandlers.heading(e, index);
+              elementRefs.heading.current.focus();
             }}
             className="w-full p-2 border rounded"
             placeholder="Entrez un titre..."
@@ -88,14 +148,14 @@ export default function CustomComponentConfigPanel({ onSave, onClose }) {
       case 'image':
         return (
           <input
-            id={`image-${element.index}`}
-            name={`image-${element.index}`}
+            ref={elementRefs.image}
+            id={`image-${index}`}
+            name={`image-${index}`}
             type="text"
             value={element.content.image}
             onChange={(e) => {
-              setElements(prev => prev.map((el, i) => 
-                i === element.index ? { ...el, content: { ...el.content, image: e.target.value } } : el
-              ));
+              elementHandlers.image(e, index);
+              elementRefs.image.current.focus();
             }}
             className="w-full p-2 border rounded"
             placeholder="URL de l'image..."
@@ -104,14 +164,14 @@ export default function CustomComponentConfigPanel({ onSave, onClose }) {
       case 'video':
         return (
           <input
-            id={`video-${element.index}`}
-            name={`video-${element.index}`}
+            ref={elementRefs.video}
+            id={`video-${index}`}
+            name={`video-${index}`}
             type="text"
             value={element.content.video}
             onChange={(e) => {
-              setElements(prev => prev.map((el, i) => 
-                i === element.index ? { ...el, content: { ...el.content, video: e.target.value } } : el
-              ));
+              elementHandlers.video(e, index);
+              elementRefs.video.current.focus();
             }}
             className="w-full p-2 border rounded"
             placeholder="URL de la vidéo..."
@@ -121,27 +181,27 @@ export default function CustomComponentConfigPanel({ onSave, onClose }) {
         return (
           <div className="space-y-2">
             <input
-              id={`button-text-${element.index}`}
-              name={`button-text-${element.index}`}
+              ref={elementRefs.buttonText}
+              id={`button-text-${index}`}
+              name={`button-text-${index}`}
               type="text"
               value={element.content.button.text}
               onChange={(e) => {
-                setElements(prev => prev.map((el, i) => 
-                  i === element.index ? { ...el, content: { ...el.content, button: { ...el.content.button, text: e.target.value } } } : el
-                ));
+                elementHandlers.buttonText(e, index);
+                elementRefs.buttonText.current.focus();
               }}
               className="w-full p-2 border rounded"
               placeholder="Texte du bouton..."
             />
             <input
-              id={`button-link-${element.index}`}
-              name={`button-link-${element.index}`}
+              ref={elementRefs.buttonLink}
+              id={`button-link-${index}`}
+              name={`button-link-${index}`}
               type="text"
               value={element.content.button.link}
               onChange={(e) => {
-                setElements(prev => prev.map((el, i) => 
-                  i === element.index ? { ...el, content: { ...el.content, button: { ...el.content.button, link: e.target.value } } } : el
-                ));
+                elementHandlers.buttonLink(e, index);
+                elementRefs.buttonLink.current.focus();
               }}
               className="w-full p-2 border rounded"
               placeholder="Lien du bouton..."
@@ -153,126 +213,174 @@ export default function CustomComponentConfigPanel({ onSave, onClose }) {
     }
   };
 
-  const DraggableElement = ({ element, index, moveElement, renderElementContent }) => {
-    const ref = useRef(null);
+  const handleDeleteElement = (index) => {
+    setElements(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSave = () => {
+    const component = {
+      type: 'custom',
+      content: elements,
+      styles: {
+        backgroundColor: '#FFFFFF',
+        color: '#000000',
+        padding: '16px',
+        margin: '16px',
+        borderRadius: '4px'
+      }
+    };
+    onSave(component);
+  };
+
+  const handleCancel = () => {
+    onClose();
+  };
+
+  const DragDropElement = ({ element, index, moveElement }) => {
     const [{ isDragging }, drag] = useDrag({
       type: 'element',
-      item: { index },
+      item: () => ({
+        type: element.type,
+        content: element.content,
+        styles: element.styles,
+      }),
       collect: (monitor) => ({
-        isDragging: monitor.isDragging()
-      })
+        isDragging: monitor.isDragging(),
+      }),
     });
 
     const [, drop] = useDrop({
       accept: 'element',
       hover: (item, monitor) => {
-        if (!ref.current) {
-          return;
-        }
-        const dragIndex = item.index;
-        const hoverIndex = index;
+        if (!element) return;
+        const dragIndex = elements.findIndex((el) => el.type === item.type);
+        const hoverIndex = elements.findIndex((el) => el === element);
 
-        if (dragIndex === hoverIndex) {
-          return;
-        }
+        if (dragIndex === hoverIndex) return;
 
-        const hoverBoundingRect = ref.current?.getBoundingClientRect();
-        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-        const clientOffset = monitor.getClientOffset();
-        const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-        if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-          return;
-        }
-
-        if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-          return;
-        }
-
-        moveElement(dragIndex, hoverIndex);
-        item.index = hoverIndex;
-      }
+        const newElements = [...elements];
+        newElements.splice(hoverIndex, 0, newElements.splice(dragIndex, 1)[0]);
+        setElements(newElements);
+      },
     });
-
-    drag(drop(ref));
 
     return (
       <div
-        ref={ref}
-        className={`p-4 mb-2 rounded-lg border ${isDragging ? 'opacity-50' : ''}`}
+        ref={(el) => {
+          if (el) {
+            drag(drop(el));
+          }
+        }}
+        className={`p-4 border rounded flex items-center justify-between ${
+          selectedElement === element ? 'bg-blue-50 border-blue-500' : 'border-gray-200'
+        } ${isDragging ? 'opacity-50' : ''}`}
+        onClick={() => setSelectedElement(element)}
       >
-        <div className="flex justify-between items-center mb-2">
-          <h5 className="text-sm font-medium">{element.label}</h5>
-          <button
-            onClick={() => {
-              setElements(prev => prev.filter((el, i) => i !== index));
-            }}
-            className="text-red-500 hover:text-red-700"
-          >
-            <X size={16} />
-          </button>
+        <div className="flex items-center gap-4">
+          {element.icon}
+          <div className="flex-1">
+            {renderElementContent(element, index)}
+          </div>
         </div>
-        {/* Contenu spécifique à chaque type d'élément */}
-        {renderElementContent(element)}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteElement(index);
+          }}
+          className="text-red-500 hover:text-red-700"
+        >
+          <X className="w-6 h-6" />
+        </button>
       </div>
     );
   };
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg overflow-y-auto">
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-bold">Configuration du Composant</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Palette d'éléments */}
-        <div className="mb-6">
-          <h4 className="text-sm font-semibold mb-3">Ajouter un élément</h4>
-          <div className="grid grid-cols-3 gap-2">
-            {ELEMENT_TYPES.map((type) => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-6">Configuration du Composant Personnalisé</h2>
+          <div className="space-y-4">
+            <div className="flex gap-2">
               <button
-                key={type.type}
-                onClick={() => handleAddElement(type.type)}
-                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => handleAddElement('text')}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               >
-                {type.icon}
-                <span className="text-sm">{type.label}</span>
+                Texte
               </button>
-            ))}
+              <button
+                onClick={() => handleAddElement('heading')}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Titre
+              </button>
+              <button
+                onClick={() => handleAddElement('image')}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Image
+              </button>
+              <button
+                onClick={() => handleAddElement('video')}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Vidéo
+              </button>
+              <button
+                onClick={() => handleAddElement('button')}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Bouton
+              </button>
+              <button
+                onClick={() => handleAddElement('separator')}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Séparateur
+              </button>
+              <button
+                onClick={() => handleAddElement('spacer')}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Espaceur
+              </button>
+              <button
+                onClick={() => handleAddElement('section')}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Section Intérieure
+              </button>
+              <button
+                onClick={() => handleAddElement('editor')}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Éditeur de Texte
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {elements.map((element, index) => (
+                <DragDropElement
+                  key={index}
+                  element={element}
+                  index={index}
+                  moveElement={moveElement}
+                />
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Liste des éléments */}
-        <div className="space-y-4">
-          {elements.map((element, index) => (
-            <DraggableElement
-              key={element.type + index}
-              element={{ ...element, index }}
-              index={index}
-              moveElement={moveElement}
-              renderElementContent={renderElementContent}
-            />
-          ))}
-        </div>
-
-        {/* Bouton de sauvegarde */}
-        <div className="mt-8">
-          <div className="flex gap-4">
+          <div className="flex justify-end mt-6 space-x-4">
             <button
-              onClick={onClose}
-              className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center justify-center"
+              onClick={handleCancel}
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
             >
-              <X className="mr-2" size={16} />
               Annuler
             </button>
             <button
-              onClick={() => onSave(elements)}
-              className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center"
+              onClick={handleSave}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
-              <Check className="mr-2" size={16} />
               Sauvegarder
             </button>
           </div>
@@ -280,4 +388,6 @@ export default function CustomComponentConfigPanel({ onSave, onClose }) {
       </div>
     </div>
   );
-}
+};
+
+export default CustomComponentConfigPanel;
