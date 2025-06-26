@@ -7,11 +7,14 @@ import CodeView from './CodeView';
 import ThemePanel from './ThemePanel';
 import SaveModal from './SaveModal';
 import Notification from './Notification';
+import ComponentCustomizerPopup from './ComponentCustomizerPopup';
 
 export default function Builder({ initialProject, onSave, onNavigate }) {
   const [components, setComponents] = useState(initialProject?.components || []);
   const [isPreview, setIsPreview] = useState(false);
-  const [showCode, setShowCode] = useState(false);  const [showTheme, setShowTheme] = useState(false);
+  const [showCode, setShowCode] = useState(false);  
+  const [showCustomizer, setShowCustomizer] = useState(false);  
+  const [showTheme, setShowTheme] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [newPageName, setNewPageName] = useState('');
 
@@ -34,15 +37,19 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
   }, [initialProject]);
 
   const addComponent = useCallback((type) => {
-    const newComponent = {
-      id: `${type}-${Date.now()}`,
-      type,
-      content: getDefaultContent(type),
-      styles: {}
-    };
-    setComponents(prev => [...prev, newComponent]);
+    if (type === 'custom') {
+      setShowCustomizer(true);
+    } else {
+      const newComponent = {
+        id: `${type}-${Date.now()}`,
+        type,
+        content: getDefaultContent(type),
+        styles: {}
+      };
+      setComponents(prev => [...prev, newComponent]);
+    }
   }, []);
- 
+
   const updateComponent = useCallback((id, content) => {
     setComponents(prev =>
       prev.map(comp => comp.id === id ? { ...comp, content } : comp)
@@ -81,6 +88,22 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
           textColor: theme.textColor || '#1F2937'
         },
         components: components.map(comp => {
+          if (comp.type === 'custom') {
+            return {
+              id: comp.id,
+              type: comp.type,
+              content: comp.content,
+              styles: {
+                ...comp.styles,
+                // Supprimer les styles vides
+                ...(comp.styles?.padding ? { padding: comp.styles.padding } : {}),
+                ...(comp.styles?.margin ? { margin: comp.styles.margin } : {}),
+                ...(comp.styles?.borderRadius ? { borderRadius: comp.styles.borderRadius } : {}),
+                ...(comp.styles?.backgroundColor ? { backgroundColor: comp.styles.backgroundColor } : {})
+              }
+            };
+          }
+          
           // Pour les autres composants, garder la logique existante
           return {
             id: comp.id,
@@ -272,6 +295,16 @@ export default function Builder({ initialProject, onSave, onNavigate }) {
           onSave={() => handleSave(onNavigate)}
           initialName={newPageName}
           onNameChange={setNewPageName}
+        />
+      )}
+
+      {showCustomizer && (
+        <ComponentCustomizerPopup
+          onSave={(component) => {
+            setComponents(prev => [...prev, component]);
+            setShowCustomizer(false);
+          }}
+          onClose={() => setShowCustomizer(false)}
         />
       )}
 

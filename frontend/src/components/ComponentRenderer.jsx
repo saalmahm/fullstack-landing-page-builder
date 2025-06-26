@@ -1,11 +1,12 @@
 import React from 'react';
-import HeaderComponent from './components/HeaderComponent';
-import HeroComponent from './components/HeroComponent';
-import FeaturesComponent from './components/FeaturesComponent';
-import TestimonialsComponent from './components/TestimonialsComponent';
-import CTAComponent from './components/CTAComponent';
-import FooterComponent from './components/FooterComponent';
-import { Text, Heading, Image, Video, Plus } from 'lucide-react';
+import { Text, Heading, Image, Plus } from 'lucide-react';
+
+const icons = {
+  text: Text,
+  heading: Heading,
+  image: Image,
+  button: Plus
+};
 
 export default function ComponentRenderer({ component, onEdit, isPreview = false, theme }) {
   const renderComponent = () => {
@@ -16,133 +17,90 @@ export default function ComponentRenderer({ component, onEdit, isPreview = false
       theme,
     };
 
-    switch (component.type) {
-      case 'header':
-        return <HeaderComponent {...commonProps} />;
-      case 'hero':
-        return <HeroComponent {...commonProps} />;
-      case 'features':
-        return <FeaturesComponent {...commonProps} />;
-      case 'testimonials':
-        return <TestimonialsComponent {...commonProps} />;
-      case 'cta':
-        return <CTAComponent {...commonProps} />;
-      case 'footer':
-        return <FooterComponent {...commonProps} />;
-      case 'custom':
-        // Vérifier si le contenu est un objet valide avec une propriété elements
-        if (!component.content || typeof component.content !== 'object' || 
-            !component.content.elements || !Array.isArray(component.content.elements)) {
-          console.error('Invalid custom component data:', component);
-          return (
-            <div className="p-4 text-red-500">
-              Erreur: Les éléments ne sont pas un tableau valide
-            </div>
-          );
-        }
-
-        // Vérifier si les éléments sont valides
-        const validElements = component.content.elements.filter(element => 
-          element && typeof element === 'object' && 
-          element.type && 
-          element.content
-        );
-
+    if (component.type === 'custom') {
+      // Vérifier si le contenu est un objet valide avec une propriété elements
+      if (!component.content || typeof component.content !== 'object' || 
+          !component.content.elements || !Array.isArray(component.content.elements)) {
+        console.error('Invalid custom component data:', component);
         return (
-          <div className="space-y-4">
-            {validElements.map((element, index) => {
-              // Vérifier la validité des données
-              if (!element.type || !element.content) {
-                return null;
-              }
+          <div className="p-4 text-red-500">
+            Erreur: Les éléments ne sont pas un tableau valide
+          </div>
+        );
+      }
 
-              const Icon = {
-                text: Text,
-                heading: Heading,
-                image: Image,
-                video: Video,
-                button: Plus
-              }[element.type];
+      // Vérifier si les éléments sont valides
+      const validElements = component.content.elements.filter(element => 
+        element && typeof element === 'object' && 
+        element.type && 
+        element.content
+      );
 
-              const styleProps = {
-                backgroundColor: element.styles.backgroundColor,
-                color: element.styles.color,
-                padding: element.styles.padding,
-                margin: element.styles.margin,
-                borderRadius: element.styles.borderRadius,
-                textAlign: element.styles.textAlign,
-                fontSize: element.styles.fontSize,
-                fontWeight: element.styles.fontWeight,
-                lineHeight: element.styles.lineHeight,
-                letterSpacing: element.styles.letterSpacing,
-                textDecoration: element.styles.textDecoration
-              };
+      // Vérifier si le composant a des styles valides
+      const validStyles = component.styles || {};
+      const styleProps = {
+        backgroundColor: validStyles.backgroundColor,
+        color: validStyles.color,
+        padding: validStyles.padding || '16px',
+        margin: validStyles.margin || '0',
+        borderRadius: validStyles.borderRadius || '0',
+        fontFamily: validStyles.fontFamily || 'Inter',
+        fontSize: validStyles.fontSize || '16px',
+        textAlign: validStyles.textAlign || 'left'
+      };
 
-              return (
-                <div key={element.id || index} className="p-4 border rounded-lg" style={styleProps}>
-                  <div className="flex items-center gap-2 mb-2">
-                    {Icon && <Icon size={16} />}
-                    <span className="text-sm font-medium">{element.type}</span>
-                  </div>
-                  {element.content.text && (
-                    <p className="text-gray-700" style={styleProps}>{element.content.text}</p>
-                  )}
-                  {element.content.heading && (
-                    <h3 className="text-lg font-semibold" style={styleProps}>{element.content.heading}</h3>
-                  )}
-                  {element.content.image && (
-                    <div className="relative w-full">
-                      <img 
-                        src={element.content.image} 
-                        alt={element.content.alt || 'Image'}
-                        className="max-w-full rounded-lg"
-                        style={{
-                          ...styleProps,
-                          objectFit: 'cover'
-                        }}
-                      />
-                    </div>
-                  )}
-                  {element.content.video && (
-                    <div className="relative w-full">
-                      <video 
-                        src={element.content.video} 
-                        controls
-                        className="max-w-full rounded-lg"
-                        style={{
-                          ...styleProps,
-                          objectFit: 'cover'
-                        }}
-                      />
-                    </div>
-                  )}
-                  {element.content.button && (
-                    <a 
-                      href={element.content.button.link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                      style={{
-                        ...styleProps,
-                        backgroundColor: element.styles.backgroundColor,
-                        color: element.styles.color
-                      }}
-                    >
-                      {element.content.button.text}
-                    </a>
-                  )}
+      return (
+        <div 
+          className="custom-component"
+          style={styleProps}
+        >
+          {validElements.map((element, index) => (
+            <div 
+              key={element.id || index}
+              className={`element-${element.type}`}
+              style={element.styles || {}}
+            >
+              {element.type === 'text' && (
+                <div className="flex items-center gap-2 mb-2">
+                  <icons.text className="w-4 h-4 text-gray-400" />
+                  <p className="text-element">{element.content.text}</p>
                 </div>
-              );
-            })}
-          </div>
-        );
-      default:
-        return (
-          <div className="p-8 text-center text-gray-500">
-            Composant inconnu: {component.type}
-          </div>
-        );
+              )}
+              {element.type === 'heading' && (
+                <div className="flex items-center gap-2 mb-2">
+                  <icons.heading className="w-4 h-4 text-gray-400" />
+                  <h2 className="heading-element">{element.content.text}</h2>
+                </div>
+              )}
+              {element.type === 'image' && (
+                <div className="flex items-center gap-2 mb-2">
+                  <icons.image className="w-4 h-4 text-gray-400" />
+                  <img 
+                    src={element.content.url} 
+                    alt={element.content.alt} 
+                    className="image-element max-w-full"
+                  />
+                </div>
+              )}
+              {element.type === 'button' && (
+                <div className="flex items-center gap-2 mb-2">
+                  <icons.button className="w-4 h-4 text-gray-400" />
+                  <a 
+                    href={element.content.link}
+                    className="button-element inline-block px-4 py-2 rounded"
+                    style={element.styles}
+                  >
+                    {element.content.text}
+                  </a>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      );
     }
+
+    return null;
   };
 
   return (

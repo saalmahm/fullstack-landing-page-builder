@@ -35,7 +35,7 @@ export default function Canvas({ components, onUpdateComponent, onDeleteComponen
           <div className="space-y-6">
             {components.map((component, index) => (
               <DraggableComponent
-                key={component.id}
+                key={`draggable-${component.id}-${index}`}
                 id={component.id}
                 index={index}
                 onMoveComponent={onMoveComponent}
